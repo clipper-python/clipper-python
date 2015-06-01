@@ -101,8 +101,8 @@ namespace std
 %typemap(in) (const clipper::String&)
 {
    std::string ss = PyString_AsString($input);
-   clipper::String s(ss);
-   $1 = &(s);
+   clipper::String *s = new clipper::String(ss);
+   $1 = s;
 }
 
 %include "../clipper/core/clipper_types.h"
@@ -245,12 +245,14 @@ namespace clipper
 } // namespace clipper
 
 
+/*
 %typemap(in) (const clipper::String&)
 {
    std::string ss = PyString_AsString($input);
-   clipper::String s(ss);
-   $1 = &(s);
+   clipper::String *s = new clipper::String(ss);
+   $1 = s;
 }
+*/
 
 %include "../clipper/core/coords.h"
 

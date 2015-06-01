@@ -852,6 +852,7 @@ namespace clipper {
 namespace clipper {
   %template(TargetFn_scaleEsq_E_sigE_T) TargetFn_scaleEsq<clipper::data32::E_sigE>;
   %template(TargetFn_meanFnth_F_phi_T) TargetFn_meanFnth<clipper::data32::F_phi>;
+  %template(TargetFn_scaleF1F2_F_sigF_2_T) TargetFn_scaleF1F2<clipper::data32::F_sigF,clipper::data32::F_sigF>;
 }
 
 %{
@@ -864,12 +865,17 @@ namespace clipper {
      TargetFn_meanFnth<clipper::data32::F_phi> a(hkl_data_, val);
      return a;
   }
+  TargetFn_scaleF1F2<clipper::data32::F_sigF,clipper::data32::F_sigF> TargetFn_scaleF1F2_F_sigF_2(const clipper::HKL_data<clipper::data32::F_sigF> &F1,const clipper::HKL_data<clipper::data32::F_sigF> &F2) {
+     TargetFn_scaleF1F2<clipper::data32::F_sigF,clipper::data32::F_sigF> a( F1, F2 );
+     return a;
+  }
 }
 %}
 
 namespace clipper {
   TargetFn_scaleEsq<clipper::data32::E_sigE> TargetFn_scaleEsq_E_sigE(const clipper::HKL_data<clipper::data32::E_sigE>& hkl_data_);
   TargetFn_meanFnth<clipper::data32::F_phi> TargetFn_meanFnth_F_phi(const clipper::HKL_data<clipper::data32::F_phi>& hkl_data_, float val);
+  TargetFn_scaleF1F2<clipper::data32::F_sigF,clipper::data32::F_sigF> TargetFn_scaleF1F2_F_sigF_2(const clipper::HKL_data<clipper::data32::F_sigF> &F1,const clipper::HKL_data<clipper::data32::F_sigF> &F2);
 }
 
 %include "../clipper/core/nxmap_operator.h"

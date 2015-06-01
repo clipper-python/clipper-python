@@ -13,6 +13,8 @@
 
 %ignore clipper::CCP4MTZfile::assigned_paths;
 %ignore clipper::MMDBManager::write_file(const String&);
+%ignore clipper::TargetFn_base::debug;
+%ignore clipper::ResolutionFn::debug;
 
 %{
     #include <string>
@@ -46,6 +48,9 @@
     #include "../clipper/contrib/sfcalc.h"
     #include "../clipper/contrib/edcalc.h"
     #include "../clipper/core/nxmap_operator.h"
+    #include "../clipper/core/resol_fn.h"
+    #include "../clipper/core/resol_basisfn.h"
+    #include "../clipper/core/resol_targetfn.h"
     #include "../clipper/contrib/convolution_search.h"
     #include "../clipper/contrib/mapfilter.h"
     #include "../clipper/contrib/originmatch.h"
@@ -834,6 +839,27 @@ namespace clipper {
       return (*($self))( xmap, atoms );
     }
   }
+}
+
+%include "../clipper/core/resol_fn.h"
+%include "../clipper/core/resol_basisfn.h"
+%include "../clipper/core/resol_targetfn.h"
+
+namespace clipper {
+  %template(TargetFn_scaleEsq_clipper_E_sigE_T) TargetFn_scaleEsq<clipper::data32::E_sigE>;
+}
+
+%{
+namespace clipper {
+  TargetFn_scaleEsq<clipper::data32::E_sigE> TargetFn_scaleEsq_E_sigE(const clipper::HKL_data<clipper::data32::E_sigE>& hkl_data_) {
+     TargetFn_scaleEsq<clipper::data32::E_sigE> a(hkl_data_);
+     return a;
+  }
+}
+%}
+
+namespace clipper {
+  TargetFn_scaleEsq<clipper::data32::E_sigE> TargetFn_scaleEsq_E_sigE(const clipper::HKL_data<clipper::data32::E_sigE>& hkl_data_);
 }
 
 %include "../clipper/core/nxmap_operator.h"

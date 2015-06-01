@@ -850,7 +850,8 @@ namespace clipper {
 %include "../clipper/core/resol_targetfn.h"
 
 namespace clipper {
-  %template(TargetFn_scaleEsq_clipper_E_sigE_T) TargetFn_scaleEsq<clipper::data32::E_sigE>;
+  %template(TargetFn_scaleEsq_E_sigE_T) TargetFn_scaleEsq<clipper::data32::E_sigE>;
+  %template(TargetFn_meanFnth_F_phi_T) TargetFn_meanFnth<clipper::data32::F_phi>;
 }
 
 %{
@@ -859,11 +860,16 @@ namespace clipper {
      TargetFn_scaleEsq<clipper::data32::E_sigE> a(hkl_data_);
      return a;
   }
+  TargetFn_meanFnth<clipper::data32::F_phi> TargetFn_meanFnth_F_phi(const clipper::HKL_data<clipper::data32::F_phi>& hkl_data_, float val) {
+     TargetFn_meanFnth<clipper::data32::F_phi> a(hkl_data_, val);
+     return a;
+  }
 }
 %}
 
 namespace clipper {
   TargetFn_scaleEsq<clipper::data32::E_sigE> TargetFn_scaleEsq_E_sigE(const clipper::HKL_data<clipper::data32::E_sigE>& hkl_data_);
+  TargetFn_meanFnth<clipper::data32::F_phi> TargetFn_meanFnth_F_phi(const clipper::HKL_data<clipper::data32::F_phi>& hkl_data_, float val);
 }
 
 %include "../clipper/core/nxmap_operator.h"

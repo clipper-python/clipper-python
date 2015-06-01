@@ -132,7 +132,11 @@ namespace clipper
 
 %ignore Util::Vec3<>;
 
+%include "../clipper/core/symop.h"
+%include "../clipper/core/spacegroup_data.h"
+%feature ("flatnested","1");
 %include "../clipper/core/spacegroup.h"
+%feature ("flatnested","0");
 
 namespace clipper
 {

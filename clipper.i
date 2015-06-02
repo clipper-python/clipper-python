@@ -43,6 +43,7 @@
     #include "../clipper/core/hkl_data.h"
     #include "../clipper/core/hkl_compute.h"
     #include "../clipper/cif/cif_data_io.h"
+    #include "../clipper/core/ramachandran.h"
     #include "../clipper/contrib/sfcalc_obs.h"
     #include "../clipper/contrib/sfweight.h"
     #include "../clipper/contrib/sfcalc.h"
@@ -759,7 +760,7 @@ namespace clipper
 
 }
 
-
+%include "../clipper/core/ramachandran.h"
 
 %include "../clipper/cif/cif_data_io.h"
 %include "../clipper/contrib/sfcalc_obs.h"

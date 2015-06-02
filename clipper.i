@@ -853,6 +853,13 @@ namespace clipper {
   %template(TargetFn_scaleEsq_E_sigE_T) TargetFn_scaleEsq<clipper::data32::E_sigE>;
   %template(TargetFn_meanFnth_F_phi_T) TargetFn_meanFnth<clipper::data32::F_phi>;
   %template(TargetFn_scaleF1F2_F_sigF_2_T) TargetFn_scaleF1F2<clipper::data32::F_sigF,clipper::data32::F_sigF>;
+
+  %template (TargetFn_scaleLogF1F2_F_sigF_2_T) TargetFn_scaleLogF1F2<data32::F_sigF,data32::F_sigF>;
+  %template (TargetFn_scaleI1I2_I_sigI_2_T) TargetFn_scaleI1I2<data32::I_sigI,data32::I_sigI>;
+  %template (TargetFn_scaleLogI1I2_I_sigI_2_T) TargetFn_scaleLogI1I2<data32::I_sigI,data32::I_sigI>;
+  %template (TargetFn_meanEnth_E_sigE_T) TargetFn_meanEnth<data32::E_sigE>;
+  %template (TargetFn_sigmaa_omegaa_E_sigE_T) TargetFn_sigmaa_omegaa<data32::E_sigE>;
+  %template (TargetFn_sigmaa_E_sigE_T) TargetFn_sigmaa<data32::E_sigE>;
 }
 
 %{
@@ -869,6 +876,37 @@ namespace clipper {
      TargetFn_scaleF1F2<clipper::data32::F_sigF,clipper::data32::F_sigF> a( F1, F2 );
      return a;
   }
+
+  TargetFn_scaleLogF1F2<data32::F_sigF,data32::F_sigF> TargetFn_scaleLogF1F2_F_sigF_2( const HKL_data<data32::F_sigF>& hkl_data1_, const HKL_data<data32::F_sigF>& hkl_data2_ ){
+     TargetFn_scaleLogF1F2<data32::F_sigF,data32::F_sigF> a(hkl_data1_,hkl_data2_);
+     return a;
+  }
+
+  TargetFn_scaleI1I2<data32::I_sigI,data32::I_sigI> TargetFn_scaleI1I2_I_sigI_2( const HKL_data<data32::I_sigI>& hkl_data1_, const HKL_data<data32::I_sigI>& hkl_data2_ ){
+     TargetFn_scaleI1I2<data32::I_sigI,data32::I_sigI> a(hkl_data1_,hkl_data2_);
+     return a;
+  }
+
+  TargetFn_scaleLogI1I2<data32::I_sigI,data32::I_sigI> TargetFn_scaleLogI1I2_I_sigI_2( const HKL_data<data32::I_sigI>& hkl_data1_, const HKL_data<data32::I_sigI>& hkl_data2_ ){
+     TargetFn_scaleLogI1I2<data32::I_sigI,data32::I_sigI> a(hkl_data1_,hkl_data2_);
+     return a;
+  }
+
+  TargetFn_meanEnth<data32::E_sigE> TargetFn_meanEnth_E_sigE( const HKL_data<data32::E_sigE>& hkl_data_, const ftype& n ){
+     TargetFn_meanEnth<data32::E_sigE> a(hkl_data_,n);
+     return a;
+  }
+
+  TargetFn_sigmaa_omegaa<data32::E_sigE> TargetFn_sigmaa_omegaa_E_sigE_2( const HKL_data<data32::E_sigE>& eo, const HKL_data<data32::E_sigE>& ec ){
+     TargetFn_sigmaa_omegaa<data32::E_sigE> a(eo,ec);
+     return a;
+  }
+
+  TargetFn_sigmaa<data32::E_sigE> TargetFn_sigmaa_E_sigE_2( const HKL_data<data32::E_sigE>& eo, const HKL_data<data32::E_sigE>& ec ){
+     TargetFn_sigmaa<data32::E_sigE> a(eo,ec);
+     return a;
+  }
+
 }
 %}
 
@@ -876,6 +914,13 @@ namespace clipper {
   TargetFn_scaleEsq<clipper::data32::E_sigE> TargetFn_scaleEsq_E_sigE(const clipper::HKL_data<clipper::data32::E_sigE>& hkl_data_);
   TargetFn_meanFnth<clipper::data32::F_phi> TargetFn_meanFnth_F_phi(const clipper::HKL_data<clipper::data32::F_phi>& hkl_data_, float val);
   TargetFn_scaleF1F2<clipper::data32::F_sigF,clipper::data32::F_sigF> TargetFn_scaleF1F2_F_sigF_2(const clipper::HKL_data<clipper::data32::F_sigF> &F1,const clipper::HKL_data<clipper::data32::F_sigF> &F2);
+
+  TargetFn_scaleLogF1F2<data32::F_sigF,data32::F_sigF> TargetFn_scaleLogF1F2_F_sigF_2( const HKL_data<data32::F_sigF>& hkl_data1_, const HKL_data<data32::F_sigF>& hkl_data2_ );
+  TargetFn_scaleI1I2<data32::I_sigI,data32::I_sigI> TargetFn_scaleI1I2_I_sigI_2( const HKL_data<data32::I_sigI>& hkl_data1_, const HKL_data<data32::I_sigI>& hkl_data2_ );
+  TargetFn_scaleLogI1I2<data32::I_sigI,data32::I_sigI> TargetFn_scaleLogI1I2_I_sigI_2( const HKL_data<data32::I_sigI>& hkl_data1_, const HKL_data<data32::I_sigI>& hkl_data2_ );
+  TargetFn_meanEnth<data32::E_sigE> TargetFn_meanEnth_E_sigE( const HKL_data<data32::E_sigE>& hkl_data_, const ftype& n );
+  TargetFn_sigmaa_omegaa<data32::E_sigE> TargetFn_sigmaa_omegaa_E_sigE_2( const HKL_data<data32::E_sigE>& eo, const HKL_data<data32::E_sigE>& ec );
+  TargetFn_sigmaa<data32::E_sigE> TargetFn_sigmaa_E_sigE_2( const HKL_data<data32::E_sigE>& eo, const HKL_data<data32::E_sigE>& ec );
 }
 
 %include "../clipper/core/nxmap_operator.h"

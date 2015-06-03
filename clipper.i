@@ -1,4 +1,4 @@
-%module clipper
+%module(directors="1") clipper
 
 %include "std_vector.i"
 %include "std_string.i"
@@ -82,6 +82,17 @@
 %}
 
 
+%feature ("director") clipper::Container;
+%feature ("director") clipper::TargetFn_base;
+%feature ("director") clipper::HKL_data_base;
+%feature ("director") clipper::BasisFn_base;
+%feature ("director") clipper::OriginMatch_base;
+//%feature ("director") clipper::Convolution_search_base;
+//%feature ("director") clipper::MapFilter_base;
+%feature ("director") clipper::SFscale_base;
+%feature ("director") clipper::SFweight_base;
+%feature ("director") clipper::EDcalc_base;
+%feature ("director") clipper::SFcalc_base;
 
 namespace std 
 {

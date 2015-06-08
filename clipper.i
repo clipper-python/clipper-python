@@ -348,6 +348,15 @@ namespace clipper {
       Coord_orth c(v2[0],v2[1],v2[2]);
       return c;
     };
+    Coord_frac __mul__ (const Coord_frac &v_) {
+      Vec3<float> v;
+      v[0] = v_[0];
+      v[1] = v_[1];
+      v[2] = v_[2];
+      Vec3<float> v2 = ((*self)*v);
+      Coord_frac c(v2[0],v2[1],v2[2]);
+      return c;
+    };
     Mat33<float> __mul__ (const Mat33<float> &m) {
       return (*self*m);
     };

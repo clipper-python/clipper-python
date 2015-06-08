@@ -125,6 +125,31 @@ namespace std
 %include "../clipper/core/clipper_types.h"
 %include "../clipper/core/clipper_util.h"
 
+%inline %{
+  struct matrixRow {
+    Mat33<float> *mat;
+    int row; // Row number
+    float __getitem__(int i) {
+      return (*mat)(row,i);
+    };
+    void __setitem__(int i, double val) {
+      (*mat)(row,i) = val;
+    };
+  };
+%}
+
+namespace clipper {
+  %template(Mat33_float) Mat33<float>;
+  %extend Mat33<float> {
+    matrixRow __getitem__(int i) {
+      matrixRow r;
+      r.mat = self;
+      r.row = i;
+      return r;
+    };
+  };
+}
+
 namespace clipper
 {
     %rename(is_nan_float) Util::is_nan(const ftype32);
@@ -821,10 +846,65 @@ void SetFlagBothIfMissing(clipper::HKL_data<clipper::data32::Flag> &flag, const 
       flag[ih].flag() = clipper::SFweight_spline<float>::BOTH;
     else
       flag[ih].flag() = clipper::SFweight_spline<float>::NONE;
-}  
+}
+void SetData(const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F1, const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F2, const clipper::String &CHECK, const clipper::String &OPS, const clipper::String &ELSE_OPS){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  std::vector<clipper::String> ops = OPS.split(",");
+  std::vector<clipper::String> else_ops = ELSE_OPS.split(",");
+  std::cout << "SetData" << std::endl;
+  if(CHECK=="BOTH_PRESENT"){
+    for ( HRI ih = F1.first(); !ih.last(); ih.next() ){
+      if( !F1[ih].missing() && !F2[ih].missing() ){
+        for(unsigned int i=0;i<ops.size();i++){
+          std::vector<clipper::String> vs = ops[i].split("=");
+          std::cout << vs[0] << std::endl;
+        }
+      } else {
+        std::cout << "else ..." << std::endl;
+        for(unsigned int i=0;i<else_ops.size();i++){
+          std::vector<clipper::String> vs = else_ops[i].split("=");
+          bool isNeg = false;
+          clipper::String theArg=vs[1];
+          if(vs[1][0]=='-'){
+            isNeg = true;
+            theArg = vs[1].split("-")[0];
+          }
+          double val=0.0;
+          bool isNull = false;
+          if(theArg=="ZERO"){
+            val = 0.0;
+          } else if(theArg=="NULL"){
+            isNull = true;
+          } else if(theArg=="2F") {
+            val = F2[ih].f();
+          } else if(theArg=="2SIGF") {
+            val = F2[ih].sigf();
+          } else if(theArg=="2F_PL") {
+            val = F2[ih].f_pl();
+          } else if(theArg=="2SIGF_PL") {
+            val = F2[ih].sigf_pl();
+          } else if(theArg=="2F_MI") {
+            val = F2[ih].f_mi();
+          } else if(theArg=="2SIGF_MI") {
+            val = F2[ih].sigf_mi();
+          } else if(theArg=="2COV") {
+            val = F2[ih].cov();
+          } else {
+            val = theArg.f();
+          }
+          if(isNeg){
+            val = -val;
+          }
+          std::cout << vs[0] << " " << theArg << " " << val << std::endl;
+        }
+      }
+    }
+  }
+}
 %}
 void SetFlagBoth(clipper::HKL_data<clipper::data32::Flag> &flag);
 void SetFlagBothIfMissing(clipper::HKL_data<clipper::data32::Flag> &flag, const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &myfsigf, const clipper::HKL_data< clipper::datatypes::Flag > &status, int freeflag);
+void SetData(const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F1, const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F2, const clipper::String &CHECK, const clipper::String &OPS, const clipper::String &ELSE_OPS);
 
 %include "../clipper/contrib/edcalc.h"
 namespace clipper {

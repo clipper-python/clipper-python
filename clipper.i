@@ -152,6 +152,8 @@ namespace clipper {
 
 namespace clipper
 {
+  %ignore Cell::matrix_orth() const; 
+  %ignore Cell::matrix_frac() const; 
     %rename(is_nan_float) Util::is_nan(const ftype32);
     %rename(is_nan_double) Util::is_nan(const ftype64);
     %rename(is_nan_float_slow) Util::isnan(ftype32);
@@ -289,6 +291,37 @@ namespace clipper
   };
 
 } // namespace clipper
+
+namespace clipper {
+  %extend Cell {
+      Mat33<float> matrix_orth() {
+      Mat33<float> orth;
+      orth(0,0) = (self->matrix_orth())(0,0);
+      orth(0,1) = (self->matrix_orth())(0,1);
+      orth(0,2) = (self->matrix_orth())(0,2);
+      orth(1,0) = (self->matrix_orth())(1,0);
+      orth(1,1) = (self->matrix_orth())(1,1);
+      orth(1,2) = (self->matrix_orth())(1,2);
+      orth(2,0) = (self->matrix_orth())(2,0);
+      orth(2,1) = (self->matrix_orth())(2,1);
+      orth(2,2) = (self->matrix_orth())(2,2);
+      return orth;
+    };
+      Mat33<float> matrix_frac() {
+      Mat33<float> frac;
+      frac(0,0) = (self->matrix_frac())(0,0);
+      frac(0,1) = (self->matrix_frac())(0,1);
+      frac(0,2) = (self->matrix_frac())(0,2);
+      frac(1,0) = (self->matrix_frac())(1,0);
+      frac(1,1) = (self->matrix_frac())(1,1);
+      frac(1,2) = (self->matrix_frac())(1,2);
+      frac(2,0) = (self->matrix_frac())(2,0);
+      frac(2,1) = (self->matrix_frac())(2,1);
+      frac(2,2) = (self->matrix_frac())(2,2);
+      return frac;
+    };
+  };
+}
 
 
 /*

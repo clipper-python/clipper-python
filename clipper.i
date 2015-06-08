@@ -138,18 +138,6 @@ namespace std
   };
 %}
 
-namespace clipper {
-  %template(Mat33_float) Mat33<float>;
-  %extend Mat33<float> {
-    matrixRow __getitem__(int i) {
-      matrixRow r;
-      r.mat = self;
-      r.row = i;
-      return r;
-    };
-  };
-}
-
 namespace clipper
 {
   %ignore Cell::matrix_orth() const; 
@@ -334,6 +322,43 @@ namespace clipper {
 */
 
 %include "../clipper/core/coords.h"
+
+namespace clipper {
+  %template(Mat33_float) Mat33<float>;
+  %template(Vec3_float) Vec3<float>;
+  %extend Mat33<float> {
+    matrixRow __getitem__(int i) {
+      matrixRow r;
+      r.mat = self;
+      r.row = i;
+      return r;
+    };
+    Mat33<float> __neg__ () {
+      return -(*self);
+    };
+    Vec3<float> __mul__ (const Vec3<float> &v) {
+      return ((*self)*v);
+    };
+    Coord_orth __mul__ (const Coord_orth &v_) {
+      Vec3<float> v;
+      v[0] = v_[0];
+      v[1] = v_[1];
+      v[2] = v_[2];
+      Vec3<float> v2 = ((*self)*v);
+      Coord_orth c(v2[0],v2[1],v2[2]);
+      return c;
+    };
+    Mat33<float> __mul__ (const Mat33<float> &m) {
+      return (*self*m);
+    };
+    Mat33<float> __sub__ (const Mat33<float> &m) {
+      return ((*self)+-m);
+    };
+    Mat33<float> __add__ (const Mat33<float> &m) {
+      return ((*self)+m);
+    };
+  };
+}
 
 %include "../clipper/core/hkl_info.h"
 %include "../clipper/core/hkl_data.h"

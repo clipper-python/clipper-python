@@ -16,7 +16,7 @@ find_program(PYTHON NAMES $ENV{PYTHON} python2.7 python.exe
 endif()
 message(STATUS "Python interpreter: ${PYTHON}")
 
-if(APPLE OR WIN32)
+#if(APPLE OR WIN32)
   # avoid FindPythonLibs as it can find libpython from different interpreter
   execute_process(COMMAND ${PYTHON} -c "import sys; sys.stdout.write(sys.prefix)"
                   OUTPUT_VARIABLE _PY_PREFIX
@@ -41,7 +41,7 @@ if(APPLE OR WIN32)
     message(FATAL_ERROR "Python header not found.")
   endif()
   set(PYTHON_LIBRARIES ${PYTHON_LIBRARY})
-endif()
+#endif()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 

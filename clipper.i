@@ -619,7 +619,7 @@ namespace clipper {
   }
 
   %extend MMonomer {
-    Atom __getitem__(size_t i) { 
+    MAtom __getitem__(size_t i) { 
       if (i >= $self->size()) {
         myErr = 1;
         return (*($self))[0];

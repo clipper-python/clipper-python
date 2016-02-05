@@ -5,9 +5,10 @@ try:
     import clipper
 except ImportError:
     print ('\n\nClipper module not found.'
-           '\nPlease check you are calling ccp4-python and / or python path is '
-           'set correctly.\n\n') 
+           '\nPlease check you are calling ccp4-python and / or python path '
+           'is set correctly.\n\n')
     sys.exit()
+
 
 def main():
     '''
@@ -29,7 +30,7 @@ def main():
     clipper_unittest_path = os.path.dirname(os.path.abspath(__file__))
 
     # XXX Temporay workaround
-    # Normal procedure move up one directory to include all code.  For now only 
+    # Normal procedure move up one directory to include all code.  For now only
     # run test code in this directory as some tests crash
     if False:
         start_dir = os.path.abspath(os.path.join(clipper_unittest_path, '..'))
@@ -60,4 +61,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

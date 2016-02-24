@@ -94,11 +94,11 @@ class Test(unittest.TestCase):
         self.assertEqual(mmol[0][0][0].occupancy(), 1.0)
         mmol[0][0][0].set_occupancy(0.5)
         print mmol[0][0][0].occupancy()
-#         self.assertEqual(mmol[0][0][0].occupancy(), 0.5)
+        self.assertEqual(mmol[0][0][0].occupancy(), 0.5)
 
         mmol[0][0][0].set_u_iso(10.0)
         print mmol[0][0][0].u_iso()
-#         self.assertEqual(mmol[0][0][0].u_iso(), 10.0)
+        self.assertEqual(mmol[0][0][0].u_iso(), 10.0)
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,6 +16,13 @@
 %ignore clipper::TargetFn_base::debug;
 %ignore clipper::ResolutionFn::debug;
 
+namespace std {
+  %template(FloatVector) vector<float>;
+  %template(DoubleVector) vector<double>;
+  %template(FloatFloatVector) vector<vector<float> >;
+  %template(DoubleDoubleVector) vector<vector<double> >;
+}
+
 %{
     #include <string>
     #include "../clipper/core/clipper_types.h"
@@ -550,7 +557,7 @@ namespace clipper {
   }
 
   %extend Atom_list {
-    Atom __getitem__(size_t i) { 
+    Atom& __getitem__(size_t i) { 
       if (i >= $self->size()) {
         myErr = 1;
         return (*($self))[0];
@@ -573,7 +580,7 @@ namespace clipper {
   }
 
   %extend MModel {
-    MPolymer __getitem__(size_t i) { 
+    MPolymer& __getitem__(size_t i) { 
       if (i >= $self->size()) {
         myErr = 1;
         return (*($self))[0];
@@ -596,7 +603,7 @@ namespace clipper {
   }
 
   %extend MPolymer {
-    MMonomer __getitem__(size_t i) { 
+    MMonomer& __getitem__(size_t i) { 
       if (i >= $self->size()) {
         myErr = 1;
         return (*($self))[0];
@@ -619,7 +626,7 @@ namespace clipper {
   }
 
   %extend MMonomer {
-    MAtom __getitem__(size_t i) { 
+    MAtom& __getitem__(size_t i) { 
       if (i >= $self->size()) {
         myErr = 1;
         return (*($self))[0];
@@ -676,8 +683,8 @@ namespace clipper
     
     %template(F_sigF_float) clipper::datatypes::F_sigF<float>;
     %template(F_sigF_double) clipper::datatypes::F_sigF<double>;
-    %template(HKL_data_F_sigF_float) HKL_data< clipper::data32::F_sigF >;
-    %template(HKL_data_F_sigF_double) HKL_data< clipper::data64::F_sigF >;
+    %template(HKL_data_F_sigF_float) HKL_data< clipper::datatypes::F_sigF<float> >;
+    %template(HKL_data_F_sigF_double) HKL_data< clipper::datatypes::F_sigF<double> >;
 
     %template(F_sigF_ano_float) clipper::datatypes::F_sigF_ano<float>;
     %template(F_sigF_ano_double) clipper::datatypes::F_sigF_ano<double>;
@@ -807,8 +814,8 @@ namespace clipper
     }
   }
  
-    %extend HKL_data<clipper::datatypes::Flag> {
-    clipper::datatypes::Flag __getitem__(size_t i) { 
+  %extend HKL_data<clipper::datatypes::Flag> {
+    clipper::datatypes::Flag& __getitem__(size_t i) { 
       size_t sz=0;
       for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
         sz++;
@@ -829,6 +836,29 @@ namespace clipper
       return sz;
     }
   }
+  %extend HKL_data<clipper::data32::Flag> {
+    clipper::data32::Flag& __getitem__(size_t i) { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      if (i >= sz) {
+        myErr = 1;
+        return (*($self))[0];
+      }
+      return (*($self))[i];
+      fail:
+        return (*($self))[0];
+    }
+    size_t __len__() { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      return sz;
+    }
+  }
+
   %exception HKL_data< clipper::datatypes::F_sigF<float> >::__getitem__ {
     assert(!myErr);
     $action
@@ -839,7 +869,52 @@ namespace clipper
   }
 
   %extend HKL_data< clipper::datatypes::F_sigF<float> > {
-    clipper::datatypes::F_sigF<float> __getitem__(size_t i) { 
+      std::vector<std::vector<float> > getData() { 
+      std::vector<std::vector<float> > allData;
+      for(clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+          if(!((*($self))[ih].missing())){
+              std::vector<xtype> thisData((*($self)).data_size());
+              (*($self)).data_export(ih.hkl(),&(thisData[0]));
+              std::vector<float> thisDataf((*($self)).data_size());
+              for(unsigned idat=0;idat<(*($self)).data_size();++idat) {thisDataf[idat] = thisData[idat];}
+              allData.push_back(thisDataf);
+          }
+      }
+      return allData;
+    }
+    clipper::datatypes::F_sigF<float>& __getitem__(size_t i) { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      if (i >= sz) {
+        myErr = 1;
+        return (*($self))[0];
+      }
+      return (*($self))[i];
+      fail:
+        return (*($self))[0];
+    }
+    size_t __len__() { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      return sz;
+    }
+  }
+
+  %exception HKL_data< clipper::data32::F_sigF<float> >::__getitem__ {
+    assert(!myErr);
+    $action
+    if (myErr) {
+      myErr = 0; // clear flag for next time
+      SWIG_exception(SWIG_IndexError, "Index out of bounds");
+    }
+  }
+
+  %extend HKL_data< clipper::data32::F_sigF<float> > {
+    clipper::data32::F_sigF<float>& __getitem__(size_t i) { 
       size_t sz=0;
       for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
         sz++;

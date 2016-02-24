@@ -133,7 +133,7 @@ namespace std
 %include "../clipper/core/clipper_util.h"
 
 %inline %{
-  struct matrixRow {
+  struct matrixRowClipper {
     Mat33<float> *mat;
     int row; // Row number
     float __getitem__(int i) {
@@ -334,8 +334,8 @@ namespace clipper {
   %template(Mat33_float) Mat33<float>;
   %template(Vec3_float) Vec3<float>;
   %extend Mat33<float> {
-    matrixRow __getitem__(int i) {
-      matrixRow r;
+    matrixRowClipper __getitem__(int i) {
+      matrixRowClipper r;
       r.mat = self;
       r.row = i;
       return r;

@@ -11,15 +11,9 @@
 %rename(MMonomer_TYPE) clipper::MMonomer::TYPE;
 %rename(MMDBManager_TYPE) clipper::MMDBManager::TYPE;
 
-//%ignore RTop<class T>;
-%ignore Vec3;
-//%ignore Mat33sym<class T>;
-
-
 
 /*             --  Re-define overloaded friend operators --              */
-/*          SWIG ignores them, so we re-define them so we can            */
-/*          extend and map the __xx__() ones to these later...           */
+/*                SWIG ignores them, so we re-define them                */
 
 %rename(neg_HKL)              operator-  (const HKL&);
 %rename(add_HKL)              operator+  (const HKL&, const HKL&);
@@ -201,7 +195,6 @@ namespace std
 %template (vec3_int)    clipper::Vec3<int>;
 %template (vec3_float)  clipper::Vec3<float>;
 %template (vec3_double) clipper::Vec3<double>;
-
 
 %inline %{
   struct matrixRowClipper {
@@ -601,6 +594,55 @@ namespace clipper {
       return ret;
     }
   }
+  
+/*
+%rename(equals_Coord_grid)    operator== (const Coord_grid&, const Coord_grid&);
+%rename(notequals_Coord_grid) operator!= (const Coord_grid&, const Coord_grid&); 
+%rename(neg_Coord_grid)       operator-  (const Coord_grid&);
+%rename(add_Coord_grid)       operator+  (const Coord_grid&, const Coord_grid&);
+%rename(subs_Coord_grid)      operator-  (const Coord_grid&, const Coord_grid&);
+%rename(product_Coord_grid)   operator*  (const int&, const Coord_grid&);
+%rename(transf_Coord_grid)    operator*  (const Isymop&, const Coord_grid&);
+*/
+
+  %extend Coord_grid {
+    bool __cmp__(const Coord_grid& g2){
+      bool ret;
+      ret = (*($self) == g2);
+      return ret;
+    }
+    bool __ne__(const Coord_grid& g2){
+      bool ret;
+      ret = (*($self) != g2);
+      return ret;
+    }
+    Coord_grid __add__(const Coord_grid& g2){
+      Coord_grid ret;
+      ret = *($self) + g2;
+      return ret;
+    }
+    Coord_grid __neg__( ){
+      Coord_grid ret;
+      ret = -*($self);
+      return ret;
+    }
+    Coord_grid __sub__(const Coord_grid& g2){
+      Coord_grid ret;
+      ret = *($self) - g2;
+      return ret;
+    }
+    /*Coord_grid __mul__(const int& i1){
+      Coord_grid ret;
+      ret = *($self) * i1;
+      return ret;
+    }
+    Coord_grid __mul__(const Isymop& isym){
+      Coord_grid ret;
+      ret = *($self) * isym;
+      return ret;
+    }*/
+  }
+  
   %extend Coord_orth {
     Coord_orth __add__(const Coord_orth &h2){
       Coord_orth ret;

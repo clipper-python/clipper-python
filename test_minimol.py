@@ -31,6 +31,6 @@ mod = mmol.model()
 for poly in mod:
   for mono in poly:
     for atom in mono:
-      print atom.coord_orth().x(), atom.coord_orth().y(), atom.coord_orth().z()
+      print atom.id(), atom.coord_orth().x(), atom.occupancy()
 
 print mmol[0][0][0]

@@ -11,6 +11,61 @@
 %rename(MMonomer_TYPE) clipper::MMonomer::TYPE;
 %rename(MMDBManager_TYPE) clipper::MMDBManager::TYPE;
 
+//%ignore RTop<class T>;
+%ignore Vec3;
+//%ignore Mat33sym<class T>;
+
+
+
+/*             --  Re-define overloaded friend operators --              */
+/*          SWIG ignores them, so we re-define them so we can            */
+/*          extend and map the __xx__() ones to these later...           */
+
+%rename(neg_HKL)              operator-  (const HKL&);
+%rename(add_HKL)              operator+  (const HKL&, const HKL&);
+%rename(subs_HKL)             operator-  (const HKL&, const HKL&);
+%rename(product_HKL)          operator*  (const int&, const HKL&);
+%rename(transf_HKL)           operator*  (const Isymop&, const HKL&);
+
+%rename(equals_Coord_grid)    operator== (const Coord_grid&, const Coord_grid&);
+%rename(notequals_Coord_grid) operator!= (const Coord_grid&, const Coord_grid&); 
+%rename(neg_Coord_grid)       operator-  (const Coord_grid&);
+%rename(add_Coord_grid)       operator+  (const Coord_grid&, const Coord_grid&);
+%rename(subs_Coord_grid)      operator-  (const Coord_grid&, const Coord_grid&);
+%rename(product_Coord_grid)   operator*  (const int&, const Coord_grid&);
+%rename(transf_Coord_grid)    operator*  (const Isymop&, const Coord_grid&);
+
+%rename(neg_Coord_orth)       operator-  (const Coord_orth&);
+%rename(add_Coord_orth)       operator+  (const Coord_orth&, const Coord_orth&);
+%rename(subs_Coord_orth)      operator-  (const Coord_orth&, const Coord_orth&);
+%rename(product_Coord_orth)   operator*  (const ftype&, const Coord_orth&);
+%rename(transf_Coord_orth)    operator*  (const RTop_orth&, const Coord_orth&);
+
+%rename(neg_Coord_frac)       operator-  (const Coord_frac&);
+%rename(add_Coord_frac)       operator+  (const Coord_frac&, const Coord_frac&);
+%rename(subs_Coord_frac)      operator-  (const Coord_frac&, const Coord_frac&);
+%rename(product_Coord_frac)   operator*  (const ftype&, const Coord_frac&);
+%rename(transf_Coord_frac)    operator*  (const RTop_frac&, const Coord_frac&);
+
+%rename(neg_Coord_map)        operator-  (const Coord_map&);
+%rename(add_Coord_map)        operator+  (const Coord_map&, const Coord_map&);
+%rename(subs_Coord_map)       operator-  (const Coord_map&, const Coord_map&);
+%rename(product_Coord_map)    operator*  (const ftype&, const Coord_map&);
+
+%rename(neg_U_aniso_orth)     operator-  (const U_aniso_orth&);
+%rename(add_U_aniso_orth)     operator+  (const U_aniso_orth&, const U_aniso_orth&);
+%rename(product_U_aniso_orth) operator*  (const ftype&, const U_aniso_orth&);
+
+%rename(neg_U_aniso_frac)     operator-  (const U_aniso_frac&);
+%rename(add_U_aniso_frac)     operator+  (const U_aniso_frac&, const U_aniso_frac&);
+%rename(product_U_aniso_frac) operator*  (const ftype&, const U_aniso_frac&);
+
+%rename(equals_HKL_samp)      operator== ( const HKL_sampling&, const HKL_sampling& );  
+
+/*                -- End of friend funcion redefinitions --              */
+
+
+
 %ignore clipper::CCP4MTZfile::assigned_paths;
 %ignore clipper::MMDBManager::write_file(const String&);
 %ignore clipper::TargetFn_base::debug;
@@ -22,6 +77,11 @@ namespace std {
   %template(FloatFloatVector) vector<vector<float> >;
   %template(DoubleDoubleVector) vector<vector<double> >;
 }
+
+
+
+
+
 
 %{
     #include <string>
@@ -71,6 +131,10 @@ namespace std {
     using namespace clipper;
 %}
 
+namespace clipper 
+{
+    %ignore Vec3<int>;
+}
 
 %inline 
 %{
@@ -94,29 +158,25 @@ namespace std {
 %feature ("director") clipper::HKL_data_base;
 %feature ("director") clipper::BasisFn_base;
 %feature ("director") clipper::OriginMatch_base;
-//%feature ("director") clipper::Convolution_search_base;
-//%feature ("director") clipper::MapFilter_base;
 %feature ("director") clipper::SFscale_base;
 %feature ("director") clipper::SFweight_base;
 %feature ("director") clipper::EDcalc_base;
 %feature ("director") clipper::SFcalc_base;
+%feature ("director") clipper::Util::Vec3;
 
 namespace std 
 {
    %template(UnsignedIntVector) vector<unsigned int>;
    %template(IntVector) vector<int>;
    %template(IntIntVector) vector<vector<int> >;
-   %template(DoubleVector) vector<double>;
-   %template(DoubleDoubleVector) vector<vector<double> >;
+//   %template(DoubleVector) vector<double>;
+//   %template(DoubleDoubleVector) vector<vector<double> >;
    %template(ClipperStringVector) vector<clipper::String>;
    %template(StringVector) vector<string>;
 }
 
 %apply std::string { clipper::String }
 %apply std::string& { clipper::String& }
-
-// FIXME - this one breaks compile, but it is necessary
-//%apply const std::string& { const clipper::String& } 
 
 %apply std::string { String }
 %apply std::string& { String& }
@@ -129,8 +189,19 @@ namespace std
    $1 = s;
 }
 
-%include "../clipper/core/clipper_types.h"
+
+
 %include "../clipper/core/clipper_util.h"
+
+%ignore clipper::U32;
+%ignore clipper::U64;
+
+%include "../clipper/core/clipper_types.h"
+
+%template (vec3_int)    clipper::Vec3<int>;
+%template (vec3_float)  clipper::Vec3<float>;
+%template (vec3_double) clipper::Vec3<double>;
+
 
 %inline %{
   struct matrixRowClipper {
@@ -160,13 +231,23 @@ namespace clipper
 }
 
 
-//%template(vec3_int) clipper::Vec3< int >;
-//%template(vec3_float) clipper::Vec3< ftype32 >;
-//%template(vec3_double) clipper::Vec3< ftype64 >;
 
-%ignore Util::Vec3<>;
+  /* We are getting a load of warnings whenever SWIG is trying 
+     to wrap template base classes that will never be of any use
+     in Python, so let's suppress the warnings for these 
+  */ 
+
+%warnfilter(SWIGWARN_TYPE_UNDEFINED_CLASS);
 
 %include "../clipper/core/symop.h"
+
+
+  /* Here we use immutable to deal with const char * vars */
+ 
+%immutable hall;
+%immutable hm;
+%immutable lgname;
+
 %include "../clipper/core/spacegroup_data.h"
 %feature ("flatnested","1");
 %include "../clipper/core/spacegroup.h"
@@ -328,11 +409,12 @@ namespace clipper {
 }
 */
 
+
 %include "../clipper/core/coords.h"
 
+
 namespace clipper {
-  %template(Mat33_float) Mat33<float>;
-  %template(Vec3_float) Vec3<float>;
+ 
   %extend Mat33<float> {
     matrixRowClipper __getitem__(int i) {
       matrixRowClipper r;
@@ -355,6 +437,8 @@ namespace clipper {
       Coord_orth c(v2[0],v2[1],v2[2]);
       return c;
     };
+   
+ 
     Coord_frac __mul__ (const Coord_frac &v_) {
       Vec3<float> v;
       v[0] = v_[0];
@@ -433,6 +517,7 @@ namespace clipper {
   %template(NXmap_double) NXmap<double>;
   %template(NXmap_int) NXmap<int>;
 }
+
 %include "../clipper/ccp4/ccp4_map_io.h"
 namespace clipper {
   %extend CCP4MAPfile {
@@ -448,6 +533,9 @@ namespace clipper {
 }
 %include "../clipper/ccp4/ccp4_mtz_io.h"
 %include "../clipper/ccp4/ccp4_mtz_types.h"
+
+%warnfilter("");  // Clear SWIGWARN_TYPE_UNDEFINED_CLASS warn filter
+
 %include "../clipper/ccp4/ccp4_utils.h"
 
 /*
@@ -529,6 +617,15 @@ namespace clipper {
       ret = -*($self);
       return ret;
     }
+    Coord_orth __mul__ ( const float &factor ) 
+    {
+      return factor * (*self);
+    }
+    Coord_orth __mul__ ( const RTop_orth& op )
+    {
+      return op * (*self);
+    }
+
   }
   %extend Coord_frac {
     Coord_frac __add__(const Coord_frac &h2){
@@ -545,6 +642,14 @@ namespace clipper {
       Coord_frac ret;
       ret = -*($self);
       return ret;
+    }
+    Coord_frac __mul__ ( const float &factor ) 
+    {
+      return factor * (*self);
+    }
+    Coord_frac __mul__ ( const RTop_frac& op )
+    {
+      return op * (*self);
     }
   }
   %exception Atom_list::__getitem__ {

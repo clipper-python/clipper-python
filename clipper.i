@@ -72,9 +72,13 @@ namespace std {
   %template(DoubleDoubleVector) vector<vector<double> >;
 }
 
-
-
-
+namespace clipper {
+  %rename(__getitem__) MMonomer::operator[];
+  %rename(__getitem__) MPolymer::operator[];
+  %rename(__getitem__) MiniMol::operator[];
+  %rename(__getitem__) MModel::operator[];
+  %rename(__getitem__) NXmap::operator[];
+}
 
 
 %{
@@ -147,16 +151,16 @@ namespace clipper
 %}
 
 
-%feature ("director") clipper::Container;
-%feature ("director") clipper::TargetFn_base;
-%feature ("director") clipper::HKL_data_base;
-%feature ("director") clipper::BasisFn_base;
-%feature ("director") clipper::OriginMatch_base;
-%feature ("director") clipper::SFscale_base;
-%feature ("director") clipper::SFweight_base;
-%feature ("director") clipper::EDcalc_base;
-%feature ("director") clipper::SFcalc_base;
-%feature ("director") clipper::Util::Vec3;
+%director clipper::Container;
+%director clipper::TargetFn_base;
+%director clipper::HKL_data_base;
+%director clipper::BasisFn_base;
+%director clipper::OriginMatch_base;
+%director clipper::SFscale_base;
+%director clipper::SFweight_base;
+%director clipper::EDcalc_base;
+%director clipper::SFcalc_base;
+%director clipper::Util::Vec3;
 
 namespace std 
 {
@@ -717,6 +721,7 @@ namespace clipper {
       return ($self)->size();
     }
   }
+  
   %exception MModel::__getitem__ {
     assert(!myErr);
     $action

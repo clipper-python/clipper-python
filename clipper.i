@@ -5,6 +5,8 @@
 %include "exception.i"
 %include "std_except.i"
 
+#pragma SWIG nowarn=501,505,401,389,362
+
 //%rename(clipper_Range) clipper::Range;
 //%rename(clipper_Batch) clipper::datatypes::Batch;
 
@@ -12,8 +14,7 @@
 %rename(MMDBManager_TYPE) clipper::MMDBManager::TYPE;
 
 
-/*             --  Re-define overloaded friend operators --              */
-/*                SWIG ignores them, so we re-define them                */
+/*             --  Rename overloaded friend operators --              */
 
 %rename(neg_HKL)              operator-  (const HKL&);
 %rename(add_HKL)              operator+  (const HKL&, const HKL&);
@@ -54,7 +55,16 @@
 %rename(add_U_aniso_frac)     operator+  (const U_aniso_frac&, const U_aniso_frac&);
 %rename(product_U_aniso_frac) operator*  (const ftype&, const U_aniso_frac&);
 
-%rename(equals_HKL_samp)      operator== ( const HKL_sampling&, const HKL_sampling& );  
+%rename(equals_HKL_samp)      operator== (const HKL_sampling&, const HKL_sampling& );
+
+%rename(and_MMonomer)         operator&  (const MMonomer&, const MMonomer&);
+%rename(and_MPolymer)         operator&  (const MPolymer&, const MPolymer&);
+%rename(and_MModel)           operator&  (const MModel&, const MModel&);
+
+%rename(or_MMonomer)          operator|  (const MMonomer&, const MMonomer&);
+%rename(or_MPolymer)          operator|  (const MPolymer&, const MPolymer&);
+%rename(or_MModel)            operator|  (const MModel&, const MModel&);
+
 
 /*                -- End of friend funcion redefinitions --              */
 
@@ -65,19 +75,12 @@
 %ignore clipper::TargetFn_base::debug;
 %ignore clipper::ResolutionFn::debug;
 
+
 namespace std {
   %template(FloatVector) vector<float>;
   %template(DoubleVector) vector<double>;
   %template(FloatFloatVector) vector<vector<float> >;
   %template(DoubleDoubleVector) vector<vector<double> >;
-}
-
-namespace clipper {
-  %rename(__getitem__) MMonomer::operator[];
-  %rename(__getitem__) MPolymer::operator[];
-  %rename(__getitem__) MiniMol::operator[];
-  %rename(__getitem__) MModel::operator[];
-  %rename(__getitem__) NXmap::operator[];
 }
 
 
@@ -150,6 +153,8 @@ namespace clipper
     }
 %}
 
+%ignore clipper::U32;
+%ignore clipper::U64;
 
 %director clipper::Container;
 %director clipper::TargetFn_base;
@@ -187,18 +192,26 @@ namespace std
    $1 = s;
 }
 
+namespace clipper {
+  %extend String {
+    std::string __str__() {
+      return ($self)->c_str();
+    }
+  }
+}
 
 
 %include "../clipper/core/clipper_util.h"
-
-%ignore clipper::U32;
-%ignore clipper::U64;
-
 %include "../clipper/core/clipper_types.h"
 
 %template (vec3_int)    clipper::Vec3<int>;
 %template (vec3_float)  clipper::Vec3<float>;
 %template (vec3_double) clipper::Vec3<double>;
+
+//%template (mat33_int)    clipper::Mat33<int>;
+//%template (mat33_float)  clipper::Mat33<float>;
+//%template (mat33_double) clipper::Mat33<double>;
+
 
 %inline %{
   struct matrixRowClipper {
@@ -215,8 +228,8 @@ namespace std
 
 namespace clipper
 {
-  %ignore Cell::matrix_orth() const; 
-  %ignore Cell::matrix_frac() const; 
+    %ignore Cell::matrix_orth() const;
+    %ignore Cell::matrix_frac() const;
     %rename(is_nan_float) Util::is_nan(const ftype32);
     %rename(is_nan_double) Util::is_nan(const ftype64);
     %rename(is_nan_float_slow) Util::isnan(ftype32);
@@ -232,9 +245,7 @@ namespace clipper
   /* We are getting a load of warnings whenever SWIG is trying 
      to wrap template base classes that will never be of any use
      in Python, so let's suppress the warnings for these 
-  */ 
-
-%warnfilter(SWIGWARN_TYPE_UNDEFINED_CLASS);
+  */
 
 %include "../clipper/core/symop.h"
 
@@ -488,12 +499,9 @@ class HKL_reference_index : public HKL_reference_base {
 %}
 
 
-
 %include "../clipper/core/xmap.h"
 %include "../clipper/core/nxmap.h"
-%include "../clipper/mmdb/clipper_mmdb.h"
-%include "../clipper/minimol/minimol.h"
-%include "../clipper/minimol/minimol_io.h"
+
 
 
 namespace clipper {
@@ -531,8 +539,6 @@ namespace clipper {
 %include "../clipper/ccp4/ccp4_mtz_io.h"
 %include "../clipper/ccp4/ccp4_mtz_types.h"
 
-%warnfilter("");  // Clear SWIGWARN_TYPE_UNDEFINED_CLASS warn filter
-
 %include "../clipper/ccp4/ccp4_utils.h"
 
 /*
@@ -559,7 +565,8 @@ namespace clipper {
   %template(Range_double) Range<double>;
 }
 
-%include "../clipper/core/map_utils.h"
+
+
 
 //FIXME  - We do not really want to be producing new objects. Wrapping constructor properly would be preferred.
 //         But SWIG does not let me.
@@ -579,6 +586,9 @@ namespace clipper {
      }
   };
 }
+
+%include "../clipper/core/map_utils.h"
+
 
 namespace clipper {
   %extend HKL {
@@ -717,6 +727,16 @@ namespace clipper {
       fail:
         return (*($self))[0];
     }
+    void __setitem__(size_t i, Atom& atom) {
+      if (i >= $self->size()) {
+        myErr = 1;
+        return;
+      }
+      (*($self))[i]=atom;
+      return;
+      fail:
+        return;
+    }
     size_t __len__() { 
       return ($self)->size();
     }
@@ -741,6 +761,16 @@ namespace clipper {
       fail:
         return (*($self))[0];
     }
+    void __setitem__(size_t i, MPolymer& mpol) {
+      if (i >= $self->size()) {
+        myErr = 1;
+        return;
+      }
+      (*($self))[i]=mpol;
+      return;
+      fail:
+        return;
+    }
     size_t __len__() { 
       return ($self)->size();
     }
@@ -763,6 +793,16 @@ namespace clipper {
       return (*($self))[i];
       fail:
         return (*($self))[0];
+    }
+    void __setitem__(size_t i, MMonomer& mmon) {
+      if (i >= $self->size()) {
+        myErr = 1;
+        return;
+      }
+      (*($self))[i]=mmon;
+      return;
+      fail:
+        return;
     }
     size_t __len__() { 
       return ($self)->size();
@@ -787,13 +827,27 @@ namespace clipper {
       fail:
         return (*($self))[0];
     }
+    void __setitem__(size_t i, MAtom& atom) {
+      if (i >= $self->size()) {
+        myErr = 1;
+        return;
+      }
+      (*($self))[i]=atom;
+      return;
+      fail:
+        return;
+    }
     size_t __len__() { 
       return ($self)->size();
     }
   }
 }
 
-%include "../clipper/core/hkl_datatypes.h"
+%include "../clipper/mmdb/clipper_mmdb.h"
+%include "../clipper/minimol/minimol.h"
+%include "../clipper/minimol/minimol_io.h"
+
+
 namespace clipper {
   namespace data64 {
     %extend Flag {
@@ -829,6 +883,17 @@ namespace clipper {
     }
   }
 }
+
+
+/*
+
+  The following does not have any effect. We want that renamed! (if possible)
+
+%rename (to_complex_float) operator complex<float>();
+%rename (to_complex_double) operator complex<double>();
+*/
+
+%include "../clipper/core/hkl_datatypes.h"
 
 namespace clipper 
 {

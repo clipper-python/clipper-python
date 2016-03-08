@@ -1,5 +1,5 @@
 import clipper
-
+from lxml import etree
 
 def read_pdb ( pdbin = "undefined" ) :
 
@@ -27,3 +27,21 @@ def read_pdb ( pdbin = "undefined" ) :
     else :
         log_string += "\tNo input PDB was supplied\n"
         return log_string, xml_root, None
+
+
+
+def write_pdb ( pdbout = "xyzout.pdb", molout = None ) :
+
+    log_string = "\n\t## clipper-utils: write_pdb \n\n"
+    log_string += "\tpdbout: %s\n\n" % pdbout
+
+    xml_root = etree.Element('write_pdb')
+
+    if molout is None :
+        return log_string,xml_root
+    else :
+        mmdb = clipper.MMDBfile()
+        mmdb.export_minimol( molout );
+        mmdb.write_file( pdbout, 0 );
+
+    return log_string,xml_root

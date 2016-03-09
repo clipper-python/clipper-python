@@ -3,9 +3,9 @@ from lxml import etree
 
 def random_kicks ( mmol=None, amplitude=0.0, frequency=0.0 ) :
 
-    log_string = "\n\t## clipper-utils: random_kicks \n\n"
-    log_string += "\tamplitude: %f\n\n" % amplitude
-    log_string += "\tfrequency: %f\n\n" % frequency
+    log_string = "\n  >> clipper_tools: random_kicks"
+    log_string += "\n     amplitude: %f" % amplitude
+    log_string += "\n     frequency: %f" % frequency
 
     xml_root = etree.Element('random_kicks')
 
@@ -25,14 +25,24 @@ def random_kicks ( mmol=None, amplitude=0.0, frequency=0.0 ) :
 
     model = mmol.model()
 
+    kicked = not_kicked = 0
+
     for chain in model :
         for residue in chain :
             for atom in residue :
                 if random.uniform (0.0, 100.0) < frequency :
-                    x = atom.coord_orth().x() + random.uniform ( 0.1, amplitude )
-                    y = atom.coord_orth().y() + random.uniform ( 0.1, amplitude )
-                    z = atom.coord_orth().z() + random.uniform ( 0.1, amplitude )
+                    x = atom.coord_orth().x() + random.uniform ( 0.01, amplitude )
+                    y = atom.coord_orth().y() + random.uniform ( 0.01, amplitude )
+                    z = atom.coord_orth().z() + random.uniform ( 0.01, amplitude )
                     coords = clipper.Coord_orth(x,y,z)
                     atom.set_coord_orth ( coords )
+                    kicked += 1
+                else :
+                    not_kicked += 1
+
+    log_string += "\n     %i atoms have been kicked, while %i remain in their original positions" % (kicked, not_kicked )
+    log_string += "\n     That means %f percent of the atoms have been kicked" % (kicked / (kicked + not_kicked) *100.0 )
+
+    log_string += "\n  << random_kicks has finished\n"
 
     return log_string,xml_root,mmol

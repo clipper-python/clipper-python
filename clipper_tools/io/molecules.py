@@ -3,8 +3,8 @@ from lxml import etree
 
 def read_pdb ( pdbin = "undefined" ) :
 
-    log_string = "\n\t## clipper-utils: read_pdb \n\n"
-    log_string += "\tpdbin: %s\n\n" % pdbin
+    log_string = "\n  >> clipper_tools: read_pdb"
+    log_string += "\n     pdbin: %s" % pdbin
 
     xml_root = etree.Element('read_pdb')
 
@@ -12,28 +12,23 @@ def read_pdb ( pdbin = "undefined" ) :
 
         f = clipper.MMDBfile()
         f.read_file ( pdbin )
-
-        log_string += "\tFile opened and read\n"
-
         mmol = clipper.MiniMol ()
         f.import_minimol ( mmol )
         
-        log_string += "\tMiniMol imported\n"
-        
-        log_string += "\n\t## \n\n"
+        log_string += "\n  << read_pdb has finished\n"
         
         return log_string, xml_root, mmol
     
     else :
-        log_string += "\tNo input PDB was supplied\n"
+        log_string += "\n  ERROR: No input PDB was supplied"
         return log_string, xml_root, None
 
 
 
 def write_pdb ( pdbout = "xyzout.pdb", molout = None ) :
 
-    log_string = "\n\t## clipper-utils: write_pdb \n\n"
-    log_string += "\tpdbout: %s\n\n" % pdbout
+    log_string = "\n  >> clipper_tools: write_pdb"
+    log_string += "\n     pdbout: %s" % pdbout
 
     xml_root = etree.Element('write_pdb')
 
@@ -43,5 +38,6 @@ def write_pdb ( pdbout = "xyzout.pdb", molout = None ) :
         mmdb = clipper.MMDBfile()
         mmdb.export_minimol( molout );
         mmdb.write_file( pdbout, 0 );
+        log_string += "\n  << write_pdb has finished \n"
 
     return log_string,xml_root

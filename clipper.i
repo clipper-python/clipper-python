@@ -4,6 +4,7 @@
 %include "std_string.i"
 %include "exception.i"
 %include "std_except.i"
+%include "numpy.i"
 
 #pragma SWIG nowarn=501,505,401,389,362
 
@@ -40,6 +41,7 @@ void ClipperTestPassNumpyArray(double *test_numpy_a, int test_numpy_n){
 >>> clipper.ClipperTestPassNumpyArray(a)
 */
 /* END NUMPY EXAMPLE */
+
 
 /*             --  Rename overloaded friend operators --              */
 
@@ -868,6 +870,15 @@ namespace clipper {
       return ($self)->size();
     }
   }
+
+  %extend MAtom {
+    std::string __str__( ) { 
+      return (*($self)).id() + " " + (*($self)).coord_orth().format();
+      fail:
+        return "";
+    }
+  }
+
 }
 
 %include "../clipper/mmdb/clipper_mmdb.h"

@@ -54,6 +54,7 @@ include_directories(${CCP4_INCLUDE_DIRS}
                     "${CCP4_INCLUDE_DIRS}/clipper"
                     "${CCP4_INCLUDE_DIRS}/clipper/core"
                     "${CMAKE_SOURCE_DIR}"
+                    "${CCP4_INCLUDE_DIRS}/../lib/python2.7/site-packages/numpy/core/include/"
                     "${PYTHON_INCLUDE_DIR}")
 
 SET_SOURCE_FILES_PROPERTIES(clipper.i PROPERTIES CPLUSPLUS ON)

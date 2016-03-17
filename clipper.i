@@ -7,12 +7,39 @@
 
 #pragma SWIG nowarn=501,505,401,389,362
 
+%{
+#define SWIG_FILE_WITH_INIT
+%}
+%include "numpy.i"
+%init %{
+import_array();
+%}
+
 //%rename(clipper_Range) clipper::Range;
 //%rename(clipper_Batch) clipper::datatypes::Batch;
 
 %rename(MMonomer_TYPE) clipper::MMonomer::TYPE;
 %rename(MMDBManager_TYPE) clipper::MMDBManager::TYPE;
 
+/* THIS IS AN EXAMPLE ON HOW TO USE NUMPY. COMMENT OUT TO USE!*/
+/*
+%apply (double* INPLACE_ARRAY1, int DIM1) {(double *test_numpy_a, int test_numpy_n)};
+
+%inline 
+%{ 
+#include <stdio.h>
+void ClipperTestPassNumpyArray(double *test_numpy_a, int test_numpy_n){
+  printf("Hello world %d\n",test_numpy_n);
+}
+%}
+*/
+/* // Test with
+>>> import clipper
+>>> import numpy
+>>> a = numpy.array([1,2,3,4,5,6],numpy.double)
+>>> clipper.ClipperTestPassNumpyArray(a)
+*/
+/* END NUMPY EXAMPLE */
 
 /*             --  Rename overloaded friend operators --              */
 

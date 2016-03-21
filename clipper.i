@@ -4,7 +4,6 @@
 %include "std_string.i"
 %include "exception.i"
 %include "std_except.i"
-%include "numpy.i"
 
 #pragma SWIG nowarn=501,505,401,389,362
 

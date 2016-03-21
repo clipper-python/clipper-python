@@ -23,8 +23,8 @@ import_array();
 %rename(MMDBManager_TYPE) clipper::MMDBManager::TYPE;
 
 /* THIS IS AN EXAMPLE ON HOW TO USE NUMPY. COMMENT OUT TO USE!*/
-/*
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double *test_numpy_a, int test_numpy_n)};
+/*
 
 %inline 
 %{ 
@@ -115,6 +115,7 @@ namespace std {
 
 %{
     #include <string>
+    #include <limits>
     #include "../clipper/core/clipper_types.h"
     #include "../clipper/core/hkl_lookup.h"
     #include "../clipper/core/hkl_info.h"
@@ -1124,6 +1125,25 @@ namespace clipper
   }
 
   %extend HKL_data< clipper::datatypes::F_sigF<float> > {
+
+    void getDataNumpy(double *test_numpy_a, int test_numpy_n) { 
+        int i=0;
+        for(clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next(),i++ ){
+            if(!((*($self))[ih].missing())){
+                std::vector<xtype> thisData((*($self)).data_size());
+                (*($self)).data_export(ih.hkl(),&(thisData[0]));
+                std::vector<float> thisDataf((*($self)).data_size());
+                for(unsigned idat=0;idat<(*($self)).data_size();++idat) {
+                    test_numpy_a[i*(*($self)).data_size()+idat] = thisData[idat];
+                }
+            } else {
+                for(unsigned idat=0;idat<(*($self)).data_size();++idat) {
+                    test_numpy_a[i*(*($self)).data_size()+idat] = std::numeric_limits<float>::quiet_NaN();
+                }
+            }
+        }
+    }
+      
       std::vector<std::vector<float> > getData() { 
       std::vector<std::vector<float> > allData;
       for(clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){

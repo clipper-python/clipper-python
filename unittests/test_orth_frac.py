@@ -54,14 +54,36 @@ class Test(unittest.TestCase):
 
         cell = mmol.cell()
         frac_matrix = cell.matrix_frac()
-        new_cell = clipper.Cell(clipper.Cell_descr(cell.a()+.2,cell.b(),cell.c(),cell.alpha(),cell.beta(),cell.gamma()))
-        orth_matrix = new_cell.matrix_orth()
+        orth_matrix = cell.matrix_orth()
+
+        self.assertAlmostEqual(orth_matrix[0][0], 43.615, places=3)
+        self.assertAlmostEqual(orth_matrix[1][1], 58.436, places=3)
+        self.assertAlmostEqual(orth_matrix[2][2], 53.415, places=3)
+        self.assertAlmostEqual(frac_matrix[0][0], 0.02293, places=3)
+        self.assertAlmostEqual(frac_matrix[1][1], 0.01711, places=3)
+        self.assertAlmostEqual(frac_matrix[2][2], 0.01872, places=3)
 
         for at in atoms:
             c = at.coord_orth()
             cnew = orth_matrix * (frac_matrix * c)
             cdiff = cnew - c
             xdiff,ydiff,zdiff = cdiff.x(), cdiff.y(), cdiff.z()
+            self.assertAlmostEqual(xdiff, 0.0, places=4)
+            self.assertAlmostEqual(ydiff, 0.0, places=4)
+            self.assertAlmostEqual(zdiff, 0.0, places=4)
+
+        new_cell = clipper.Cell(clipper.Cell_descr(cell.a()+.2,cell.b(),cell.c(),cell.alpha(),cell.beta(),cell.gamma()))
+        orth_matrix = new_cell.matrix_orth()
+
+        self.assertAlmostEqual(orth_matrix[0][0], 43.815, places=3)
+        self.assertAlmostEqual(orth_matrix[1][1], 58.436, places=3)
+        self.assertAlmostEqual(orth_matrix[2][2], 53.415, places=3)
+        for at in atoms:
+            c = at.coord_orth()
+            cnew = orth_matrix * (frac_matrix * c)
+            cdiff = cnew - c
+            xdiff,ydiff,zdiff = cdiff.x(), cdiff.y(), cdiff.z()
+            self.assertTrue(abs(xdiff)<0.2)
             self.assertAlmostEqual(ydiff, 0.0, places=4)
             self.assertAlmostEqual(zdiff, 0.0, places=4)
 

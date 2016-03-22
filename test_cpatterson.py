@@ -108,8 +108,11 @@ if ( ipcolf != "NONE" ):
   mtzin.import_hkl_data( fsig, ipcolf );
 if ( ipcola != "NONE" ):
   mtzin.import_hkl_data( fano, ipcola );
+# cpatterson.cpp has ipcolf below. Surely that cannot be right?
+print "ipcold",ipcold
 if ( ipcold != "NONE" ):
-  mtzin.import_hkl_data( dsig, ipcolf );
+  print "Importing",ipcold
+  mtzin.import_hkl_data( dsig, ipcold );
 mtzin.close_read();
 
 # make mean/difference F if necessary
@@ -120,6 +123,8 @@ if ( ipcola != "NONE" ):
       fsig.compute_mean_from_fano( fano );
 
 # FIXME - NEED TO SO SOMETHING CLEVER ABOUT THESE LOOPS!
+if ( ipcold != "NONE" ) :
+   clipper.SetData(fsig,dsig,"BOTH_PRESENT","1F=-2F","1F=ZERO")
 """
   // subtract difference F if necessary
   if ( ipcold != "NONE" ) 
@@ -186,7 +191,6 @@ if oremv:
     for ( HRI ih = fphi.first(); !ih.last(); ih.next() )
       if ( !fphi[ih].missing() )
 	fphi[ih].f() -= oscale.f(ih);
-  }
 """
 
 # make grid if necessary

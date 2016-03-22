@@ -1,4 +1,5 @@
 import sys
+import numpy
 import clipper
 
 i = clipper.HKL_reference_index()
@@ -59,6 +60,15 @@ if len(sys.argv)>2:
   cif.import_hkl_data(myfsigf)
   cif.import_hkl_data(status)
   cif.close_read()
+  """
+  # This is numpy testing
+  print "F_SIGF size",myfsigf.data_size(), len(myfsigf)
+  fsigf_numpy = numpy.zeros((myfsigf.data_size()* len(myfsigf)),numpy.float)
+  print fsigf_numpy ; sys.stdout.flush()
+  myfsigf.getDataNumpy(fsigf_numpy);
+  print fsigf_numpy ; sys.stdout.flush()
+  print fsigf_numpy+fsigf_numpy ; sys.stdout.flush()
+  """
   print  mydata.num_reflections()
   cxtl = clipper.MTZcrystal()
   fm = clipper.MMDBfile()

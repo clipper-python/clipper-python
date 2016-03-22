@@ -40,7 +40,7 @@ class Test(unittest.TestCase):
 
     def test_orth_frac(self, verbose=False):
         '''
-        Test minimol clipper-python bindings
+        Test mateix methods of clipper-python bindings
         '''
         pdb_in_path = os.path.join(self.test_data_path, '1uoy.pdb')
         assert os.path.exists(pdb_in_path)

@@ -93,7 +93,6 @@ void ClipperTestPassNumpyArray(double *test_numpy_a, int test_numpy_n){
 %rename(or_MPolymer)          operator|  (const MPolymer&, const MPolymer&);
 %rename(or_MModel)            operator|  (const MModel&, const MModel&);
 
-
 /*                -- End of friend funcion redefinitions --              */
 
 
@@ -238,11 +237,11 @@ namespace clipper {
 %template (vec3_double) clipper::Vec3<double>;
 
 //%template (mat33_int)    clipper::Mat33<int>;
-//%template (mat33_float)  clipper::Mat33<float>;
 //%template (mat33_double) clipper::Mat33<double>;
 
 
 %inline %{
+namespace clipper {
   struct matrixRowClipper {
     Mat33<float> *mat;
     int row; // Row number
@@ -253,7 +252,10 @@ namespace clipper {
       (*mat)(row,i) = val;
     };
   };
+}
 %}
+
+%template (mat33_float)  clipper::Mat33<float>;
 
 namespace clipper
 {
@@ -465,7 +467,7 @@ namespace clipper {
     Vec3<float> __mul__ (const Vec3<float> &v) {
       return ((*self)*v);
     };
-    Coord_orth __mul__ (const Coord_orth &v_) {
+    clipper::Coord_orth __mul__ (const clipper::Coord_orth &v_) {
       Vec3<float> v;
       v[0] = v_[0];
       v[1] = v_[1];
@@ -474,9 +476,7 @@ namespace clipper {
       Coord_orth c(v2[0],v2[1],v2[2]);
       return c;
     };
-   
- 
-    Coord_frac __mul__ (const Coord_frac &v_) {
+    clipper::Coord_frac __mul__ (const clipper::Coord_frac &v_) {
       Vec3<float> v;
       v[0] = v_[0];
       v[1] = v_[1];

@@ -1,6 +1,11 @@
 import clipper
 from lxml import etree
 
+
+## Reads a file in PDB format from the location specified by the input string 
+#  @param pdbin a string containing a fully-qualified path to a PDB file
+#  @return a log string, an etree (XML) and a clipper.MiniMol object (or None in case of error)
+
 def read_pdb ( pdbin = "undefined" ) :
 
     log_string = "\n  >> clipper_tools: read_pdb"
@@ -27,6 +32,10 @@ def read_pdb ( pdbin = "undefined" ) :
         return log_string, xml_root, None
 
 
+## Writes molout to a file in PDB format at the location specified by the input string 
+#  @param pdbout a string containing a fully-qualified path to a PDB file
+#  @param molout the molecule to write
+#  @return a log string and an etree (XML)
 
 def write_pdb ( pdbout = "xyzout.pdb", molout = None ) :
 

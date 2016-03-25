@@ -1,8 +1,7 @@
-## @package coordinate_kicks
+## @package coordinate_kicks
 # This module provides functions for guided/random distortion 
 # of models, with a focus on debiasing after Molecular Replacement 
 
-import numpy
 import clipper
 from lxml import etree
 
@@ -81,24 +80,16 @@ def atom_kicks ( mmol=None, amplitude=0.0, frequency=0.0 ) :
 #  @param frequency target frequency with which atoms will be kicked
 #  @return a plain text log string and an XML etree
 
-def fragment_kicks ( mmol=None, min_length=0, max_length=0, amplitude=0.0, frequency=0.0 ) :
+def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
     
     log_string = "\n  >> clipper_tools: fragment_kicks"
-    log_string += "\n     amplitude: %f" % amplitude
     log_string += "\n     frequency: %f" % frequency
 
     xml_root = etree.Element('fragment_kicks')
-    xml_root.attrib['amplitude']    = str(amplitude)
     xml_root.attrib['frequency']    = str(frequency)
     
     if mmol is None :
         log_string += "\n     ERROR: no valid molecule object supplied\n\n"
-        log_string += "\n  << fragment_kicks has finished\n"
-        xml_root.attrib['ok']    = 'no'
-        return log_string, xml_root
-
-    if amplitude == 0.0 or frequency == 0.0 :
-        log_string += "\n     ERROR: cannot compute kicks with zero amplitude and/or frequency\n\n"
         log_string += "\n  << fragment_kicks has finished\n"
         xml_root.attrib['ok']    = 'no'
         return log_string, xml_root
@@ -120,15 +111,18 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, amplitude=0.0, frequ
     n_fragments_kicked = 0
     kick_length = 0
     import random
+    rotation_matrix = clipper.mat33_float_identity()
     
     for chain in model :
-        ## don't want to propagate kick to another chain
+        ## don't want to propagate kick to another chain
         kick_extent = 0
-        for residue in model :
+        for residue in chain :
             if kick_extent > 0:
 
-                ## continue kicking until kick_length is 0
+                ## continue kicking until kick_length is 0
+                residue.transform ( rotation_matrix )
                 kick_length -= 1
+                
                 if kick_length == 0 :
                     n_fragments_kicked += 1 
                 
@@ -137,18 +131,37 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, amplitude=0.0, frequ
                 ## decide on the characteristics of the displacement
                 kick_extent = random.choice ( range ( min_length, max_length ) )
                 kick_attribs = etree.SubElement(xml_root, "kicked_fragment")
-                kick_attribs.attrib['start_residue'] = str (chain.id() + residue.id())
+                #kick_attribs.attrib['start_residue'] = 'A'
                 kick_attribs.attrib['kick_extent'] = str ( kick_extent )
                 
-                #vertex_coords = residue[]
-                #sign = random.choice ( [-1, 1] )
-                #x = atom.coord_orth().x() + sign * random.uniform ( 0.01, amplitude )
-                #sign = random.choice ( [-1, 1] )
-                #y = atom.coord_orth().y() + sign * random.uniform ( 0.01, amplitude )
-                #sign = random.choice ( [-1, 1] )
-                #z = atom.coord_orth().z() + sign * random.uniform ( 0.01, amplitude )
-                #coords = clipper.Coord_orth(x,y,z)
+                ## physically and chemically meaningless - we're not trying to generate
+                #  a sensible model, but to explore other choices
+                vertex_c  = residue.find(clipper.String("C"), clipper.UNIQUE)
+                vertex_ca = residue.find("CA")
                 
+                if vertex_c is not None and vertex_ca is not None:
+                    vec_rotate = clipper.vec3_float(
+                                        vertex_ca.coord_orth().x() - vertex_c.coord_orth().x(),
+                                        vertex_ca.coord_orth().y() - vertex_c.coord_orth().y(),
+                                        vertex_ca.coord_orth().z() - vertex_c.coord_orth().z())
+                    
+                    vec_ = vec_rotate.unit()
+                    import math
+                    
+                    rotation = random.uniform ( 0, 6.28 )
+                    sin_ = math.sin(rotation)
+                    cos_ = math.cos(rotation)
+                    rotation_matrix = clipper.mat33_float(
+                                        cos_ + math.pow(vec_[0],2)*(1-cos_), 
+                                        vec_[0]*vec_[1]*(1-cos_)-vec_[2]*sin_, 
+                                        vec_[0]*vec_[2]*(1-cos_)+vec_[1]*sin_,                
+                                        vec_[0]*vec_[1]*(1-cos_)+vec_[3]*sin_,
+                                        cos_ + math.pow(vec_[1],2)*(1-cos_),
+                                        vec_[1]*vec_[2]*(1-cos_)-vec_[0]*sin_, 
+                                        vec_[0]*vec_[2]*(1-cos_)-vec_[1]*sin_,                
+                                        vec_[1]*vec_[2]*(1-cos_)+vec_[0]*sin_,
+                                        cos_ + math.pow(vec_[2],2)*(1-cos_)   )
+                    
                 
     return log_string, xml_root
     

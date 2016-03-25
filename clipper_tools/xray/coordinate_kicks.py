@@ -136,6 +136,7 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
                 
                 ## physically and chemically meaningless - we're not trying to generate
                 #  a sensible model, but to explore other choices
+                ## WARNING: this causes a seg fault; investigating why...
                 vertex_c  = residue.find(clipper.String("C"), clipper.UNIQUE)
                 vertex_ca = residue.find("CA")
                 

@@ -4,6 +4,7 @@
 
 import clipper
 from lxml import etree
+from clipper_tools.general import is_aminoacid
 
 
 ## Randomly kicks the atoms in mmol, with the specified frequency and rmsd
@@ -109,25 +110,23 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
     model = mmol.model()
     
     n_fragments_kicked = 0
-    kick_length = 0
     import random
-    rotation_matrix = clipper.mat33_float_identity()
+    rotation_op = clipper.RTop_orth_identity()
     
     for chain in model :
         ## don't want to propagate kick to another chain
         kick_extent = 0
         for residue in chain :
-           
             if kick_extent > 0:
 
-                ## continue kicking until kick_length is 0
-                residue.transform ( rotation_matrix )
-                kick_length -= 1
+                ## continue kicking until kick_extent is 0
+                residue.transform ( rotation_op )
+                kick_extent -= 1
                 
-                if kick_length == 0 :
+                if kick_extent == 0 :
                     n_fragments_kicked += 1 
-                
-            elif random.uniform (0.0, 100.0) < frequency :
+
+            elif random.uniform (0.0, 100.0) < frequency and is_aminoacid ( residue.type().trim() ) :
                 
                 ## decide on the characteristics of the displacement
                 kick_extent = random.choice ( range ( min_length, max_length ) )
@@ -136,12 +135,10 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
                 kick_attribs.attrib['kick_extent'] = str ( kick_extent )
                 
                 ## physically and chemically meaningless - we're not trying to generate
-                #  a sensible model, but to explore other choices
-                ## WARNING: this causes a seg fault; investigating why...
+                #  a sensible model, but to explore other conformations quickly
                 vertex_c_idx  = residue.lookup("C", clipper.UNIQUE)
                 vertex_ca_idx = residue.lookup("CA",clipper.UNIQUE)
-                
-                if vertex_c_idx is not None and vertex_ca_idx is not None:
+                if vertex_c_idx is not -1 and vertex_ca_idx is not -1:
                     vertex_c  = residue[vertex_c_idx]
                     vertex_ca = residue[vertex_ca_idx]
                     
@@ -156,7 +153,7 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
                     rotation = random.uniform ( 0, 6.28 )
                     sin_ = math.sin(rotation)
                     cos_ = math.cos(rotation)
-                    rotation_matrix = clipper.mat33_float(
+                    rotation_matrix = clipper.mat33_ftype(
                                         cos_ + math.pow(vec_[0],2)*(1-cos_), 
                                         vec_[0]*vec_[1]*(1-cos_)-vec_[2]*sin_, 
                                         vec_[0]*vec_[2]*(1-cos_)+vec_[1]*sin_,                
@@ -166,8 +163,11 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
                                         vec_[0]*vec_[2]*(1-cos_)-vec_[1]*sin_,                
                                         vec_[1]*vec_[2]*(1-cos_)+vec_[0]*sin_,
                                         cos_ + math.pow(vec_[2],2)*(1-cos_)   )
-                    ## translation vector needed!! 
-                
+                    
+                    rotation_op = clipper.RTop_orth(rotation_matrix)
+    log_string += "\n     Number of fragments kicked: %i" % n_fragments_kicked
+    log_string += "\n  << fragment_kicks has finished\n"
+    kick_attribs.attrib['fragments_kicked'] = str ( n_fragments_kicked )                                
     return log_string, xml_root
     
     

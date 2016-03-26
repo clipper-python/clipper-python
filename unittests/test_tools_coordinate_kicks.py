@@ -48,9 +48,12 @@ class Test(unittest.TestCase):
         from clipper_tools.io.molecules import read_pdb, write_pdb
         from clipper_tools.xray.coordinate_kicks import fragment_kicks
         
-        log_string,xml_root,mmol = read_pdb(pdb_input)
-        log_string,xml_root      = fragment_kicks(mmol, 5, 20, 40.0)
-        log_string,xml_root      = write_pdb(pdb_output)
+        log_string,xml_root,mmol = read_pdb ( pdb_input )
+        print log_string
+        log_string,xml_root      = fragment_kicks ( mmol, 5, 20, 30.0 )
+        print log_string
+        log_string,xml_root      = write_pdb ( pdb_output, mmol )
+        print log_string
 
         assert os.path.exists(pdb_output)
         

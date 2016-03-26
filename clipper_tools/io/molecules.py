@@ -28,6 +28,7 @@ def read_pdb ( pdbin = "undefined" ) :
     
     else :
         log_string += "\n  ERROR: No input PDB was supplied"
+        log_string += "\n  << read_pdb has finished \n"
         xml_root.attrib['ok'] = 'no'
         return log_string, xml_root, None
 
@@ -47,6 +48,8 @@ def write_pdb ( pdbout = "xyzout.pdb", molout = None ) :
     
     if molout is None :
         xml_root.attrib['ok']    = 'no'
+        log_string += "\n  ERROR: No input MiniMol was supplied"
+        log_string += "\n  << write_pdb has finished \n"
         return log_string,xml_root
     else :
         mmdb = clipper.MMDBfile()

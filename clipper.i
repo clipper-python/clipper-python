@@ -15,6 +15,8 @@
 import_array();
 %}
 
+%apply int { size_t };
+
 //%rename(clipper_Range) clipper::Range;
 //%rename(clipper_Batch) clipper::datatypes::Batch;
 
@@ -256,6 +258,7 @@ namespace clipper {
 %}
 
 %template (mat33_float)  clipper::Mat33<float>;
+%template (mat33_ftype)  clipper::Mat33<ftype>;
 
 namespace clipper
 {
@@ -453,17 +456,20 @@ namespace clipper {
 
 
 namespace clipper {
+  %extend RTop_orth {
+	  RTop_orth ( Mat33<ftype>& mat ) {
+		  return new RTop_orth(mat);
+	  }
+  }
 
   %extend Vec3<float> {
     float __getitem__ (size_t i) {
-      if (i < 0) return (*self)[2];
-      else if (i > 2) return (*self)[2];
-      return (*self)[i];
+      if (i > 2) return (*self)[2];
+      else return (*self)[i];
       }
 
     void __setitem__ (size_t i, float value) {
-      if (i < 0) (*self)[2] = value;
-      else if (i > 2) (*self)[2] = value;
+      if (i > 2) (*self)[2] = value;
       else (*self)[i] = value;
       }
   }

@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 2.8.8)
 project(clipper-wrapper C CXX)
 
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+
 FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
@@ -50,11 +53,13 @@ SET(CMAKE_SWIG_FLAGS "")
 find_package(CCP4 REQUIRED mmdb2 clipper-core clipper-mmdb clipper-ccp4
                            clipper-cif clipper-minimol clipper-contrib ccp4c)
 
+find_package(NumPy REQUIRED)
+
 include_directories(${CCP4_INCLUDE_DIRS}
                     "${CCP4_INCLUDE_DIRS}/clipper"
                     "${CCP4_INCLUDE_DIRS}/clipper/core"
                     "${CMAKE_SOURCE_DIR}"
-                    "${CCP4_INCLUDE_DIRS}/../lib/python2.7/site-packages/numpy/core/include/"
+                    ${PYTHON_NUMPY_INCLUDE_PATH}
                     "${PYTHON_INCLUDE_DIR}")
 
 SET_SOURCE_FILES_PROPERTIES(clipper.i PROPERTIES CPLUSPLUS ON)

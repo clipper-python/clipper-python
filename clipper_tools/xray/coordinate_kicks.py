@@ -117,6 +117,7 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
         ## don't want to propagate kick to another chain
         kick_extent = 0
         for residue in chain :
+           
             if kick_extent > 0:
 
                 ## continue kicking until kick_length is 0
@@ -127,20 +128,23 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
                     n_fragments_kicked += 1 
                 
             elif random.uniform (0.0, 100.0) < frequency :
-
+                
                 ## decide on the characteristics of the displacement
                 kick_extent = random.choice ( range ( min_length, max_length ) )
                 kick_attribs = etree.SubElement(xml_root, "kicked_fragment")
-                #kick_attribs.attrib['start_residue'] = 'A'
+                kick_attribs.attrib['start_residue'] = str(residue.id())
                 kick_attribs.attrib['kick_extent'] = str ( kick_extent )
                 
                 ## physically and chemically meaningless - we're not trying to generate
                 #  a sensible model, but to explore other choices
-                ## WARNING: this causes a seg fault; investigating why...
-                vertex_c  = residue.find(clipper.String("C"), clipper.UNIQUE)
-                vertex_ca = residue.find("CA")
+                ## WARNING: this causes a seg fault; investigating why...
+                vertex_c_idx  = residue.lookup("C", clipper.UNIQUE)
+                vertex_ca_idx = residue.lookup("CA",clipper.UNIQUE)
                 
-                if vertex_c is not None and vertex_ca is not None:
+                if vertex_c_idx is not None and vertex_ca_idx is not None:
+                    vertex_c  = residue[vertex_c_idx]
+                    vertex_ca = residue[vertex_ca_idx]
+                    
                     vec_rotate = clipper.vec3_float(
                                         vertex_ca.coord_orth().x() - vertex_c.coord_orth().x(),
                                         vertex_ca.coord_orth().y() - vertex_c.coord_orth().y(),
@@ -162,7 +166,7 @@ def fragment_kicks ( mmol=None, min_length=0, max_length=0, frequency=0.0 ) :
                                         vec_[0]*vec_[2]*(1-cos_)-vec_[1]*sin_,                
                                         vec_[1]*vec_[2]*(1-cos_)+vec_[0]*sin_,
                                         cos_ + math.pow(vec_[2],2)*(1-cos_)   )
-                    
+                    ## translation vector needed!! 
                 
     return log_string, xml_root
     

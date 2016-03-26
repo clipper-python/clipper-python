@@ -453,7 +453,21 @@ namespace clipper {
 
 
 namespace clipper {
- 
+
+  %extend Vec3<float> {
+    float __getitem__ (size_t i) {
+      if (i < 0) return (*self)[2];
+      else if (i > 2) return (*self)[2];
+      return (*self)[i];
+      }
+
+    void __setitem__ (size_t i, float value) {
+      if (i < 0) (*self)[2] = value;
+      else if (i > 2) (*self)[2] = value;
+      else (*self)[i] = value;
+      }
+  }
+
   %extend Mat33<float> {
     matrixRowClipper __getitem__(int i) {
       matrixRowClipper r;

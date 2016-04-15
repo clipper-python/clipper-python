@@ -585,8 +585,8 @@ namespace clipper {
     %template(export_nxmap_double) export_nxmap<double>;
   };
 }
-%include "../clipper/ccp4/ccp4_mtz_io.h"
 %include "../clipper/ccp4/ccp4_mtz_types.h"
+%include "../clipper/ccp4/ccp4_mtz_io.h"
 
 %include "../clipper/ccp4/ccp4_utils.h"
 

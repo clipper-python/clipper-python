@@ -16,7 +16,7 @@ import numpy
 
 class Test(unittest.TestCase):
     '''
-    Unit test for Molrep (invokes GUI).
+    Unit test for EM mtz i/o
     '''
     def setUp(self):
         '''

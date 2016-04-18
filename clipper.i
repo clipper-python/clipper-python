@@ -12,7 +12,7 @@
 %}
 %include "numpy.i"
 %init %{
-import_array();
+    import_array();
 %}
 
 %apply int { size_t };
@@ -1057,6 +1057,62 @@ namespace clipper
   }
         
   
+
+  %extend HKL_data< clipper::datatypes::F_phi<float> > {
+
+    void getDataNumpy(double *test_numpy_a, int test_numpy_n) { 
+        int i=0;
+        for(clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next(),i++ ){
+            if(!((*($self))[ih].missing())){
+                std::vector<xtype> thisData((*($self)).data_size());
+                (*($self)).data_export(ih.hkl(),&(thisData[0]));
+                std::vector<float> thisDataf((*($self)).data_size());
+                for(unsigned idat=0;idat<(*($self)).data_size();++idat) {
+                    test_numpy_a[i*(*($self)).data_size()+idat] = thisData[idat];
+                }
+            } else {
+                for(unsigned idat=0;idat<(*($self)).data_size();++idat) {
+                    test_numpy_a[i*(*($self)).data_size()+idat] = std::numeric_limits<float>::quiet_NaN();
+                }
+            }
+        }
+    }
+      
+      std::vector<std::vector<float> > getData() { 
+      std::vector<std::vector<float> > allData;
+      for(clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+          if(!((*($self))[ih].missing())){
+              std::vector<xtype> thisData((*($self)).data_size());
+              (*($self)).data_export(ih.hkl(),&(thisData[0]));
+              std::vector<float> thisDataf((*($self)).data_size());
+              for(unsigned idat=0;idat<(*($self)).data_size();++idat) {thisDataf[idat] = thisData[idat];}
+              allData.push_back(thisDataf);
+          }
+      }
+      return allData;
+    }
+    clipper::datatypes::F_phi<float>& __getitem__(size_t i) { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      if (i >= sz) {
+        myErr = 1;
+        return (*($self))[0];
+      }
+      return (*($self))[i];
+      fail:
+        return (*($self))[0];
+    }
+    size_t __len__() { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      return sz;
+    }
+  }
+
   %extend HKL_data<clipper::data32::F_phi> {
     void compute_neg(const HKL_data< clipper::datatypes::F_phi<float> > &fphi ) {
       ($self)->compute( fphi, clipper::data32::Compute_neg_fphi() );
@@ -1080,6 +1136,58 @@ namespace clipper
     void compute_scale_u_aniso_fphi(float scale, clipper::U_aniso_orth u_value, 
                                   const HKL_data< clipper::datatypes::F_phi<float> > &fphi ) {
       ($self)->compute( fphi, clipper::data32::Compute_scale_u_aniso_fphi(scale, u_value) );
+    }
+
+    void getDataNumpy(double *test_numpy_a, int test_numpy_n) { 
+        int i=0;
+        for(clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next(),i++ ){
+            if(!((*($self))[ih].missing())){
+                std::vector<xtype> thisData((*($self)).data_size());
+                (*($self)).data_export(ih.hkl(),&(thisData[0]));
+                std::vector<float> thisDataf((*($self)).data_size());
+                for(unsigned idat=0;idat<(*($self)).data_size();++idat) {
+                    test_numpy_a[i*(*($self)).data_size()+idat] = thisData[idat];
+                }
+            } else {
+                for(unsigned idat=0;idat<(*($self)).data_size();++idat) {
+                    test_numpy_a[i*(*($self)).data_size()+idat] = std::numeric_limits<float>::quiet_NaN();
+                }
+            }
+        }
+    }
+      
+      std::vector<std::vector<float> > getData() { 
+      std::vector<std::vector<float> > allData;
+      for(clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+          if(!((*($self))[ih].missing())){
+              std::vector<xtype> thisData((*($self)).data_size());
+              (*($self)).data_export(ih.hkl(),&(thisData[0]));
+              std::vector<float> thisDataf((*($self)).data_size());
+              for(unsigned idat=0;idat<(*($self)).data_size();++idat) {thisDataf[idat] = thisData[idat];}
+              allData.push_back(thisDataf);
+          }
+      }
+      return allData;
+    }
+    clipper::data32::F_phi& __getitem__(size_t i) { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      if (i >= sz) {
+        myErr = 1;
+        return (*($self))[0];
+      }
+      return (*($self))[i];
+      fail:
+        return (*($self))[0];
+    }
+    size_t __len__() { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      return sz;
     }
   }
   

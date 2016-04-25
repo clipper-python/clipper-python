@@ -28,33 +28,36 @@ class ClipperMTZ(object):
 
     def import_column_data(self, column_label, get_resolution=True):
         if self.mtz_in_path is not None:
+            # Convert to ascii from if unicode
+            if isinstance(self.mtz_in_path, unicode):
+                self.mtz_in_path = self.mtz_in_path.encode('utf8')
             self.mtz.open_read(self.mtz_in_path)
             self.mtz.import_hkl_info(self.hkl_info)
             self.spacegroup = self.hkl_info.spacegroup()
             self.cell = self.hkl_info.cell()
-            fsigf = clipper.HKL_data_F_phi_float(self.hkl_info)
-            self.mtz.import_hkl_data(fsigf, '/*/*/' + column_label)
+            f_phi = clipper.HKL_data_F_phi_float(self.hkl_info)
+            self.mtz.import_hkl_data(f_phi, '/*/*/' + column_label)
             self.mtz.close_read()
             # Convert to numpy
-            fsigf_numpy = numpy.zeros((fsigf.data_size() * len(fsigf)),
+            f_phi_np = numpy.zeros((f_phi.data_size() * len(f_phi)),
                                       numpy.float)
-            fsigf.getDataNumpy(fsigf_numpy)
+            f_phi.getDataNumpy(f_phi_np)
             # Reshape and transpose
-            fsigf_numpy = numpy.reshape(fsigf_numpy, (-1, 2))
-            fsigf_numpy = numpy.transpose(fsigf_numpy)
+            f_phi_np = numpy.reshape(f_phi_np, (-1, 2))
+            f_phi_np = numpy.transpose(f_phi_np)
             # Convert to rec array to store col names
-            names = [n for n in fsigf.data_names().split()]
-            fsigf_numpy = np.core.records.fromarrays(
-                fsigf_numpy,
+            names = [n for n in f_phi.data_names().split()]
+            f_phi_np = np.core.records.fromarrays(
+                f_phi_np,
                 names=names,
                 formats='float64, float64')
             # Append to dictionary
-            self.column_data[column_label] = fsigf_numpy
+            self.column_data[column_label] = f_phi_np
             # Get resolution column
             if get_resolution:
-                res_numpy = numpy.zeros(fsigf_numpy.shape[0])
-                for n in xrange(fsigf_numpy.shape[0]):
+                res_np = numpy.zeros(f_phi_np.shape[0])
+                for n in xrange(f_phi_np.shape[0]):
                     r = self.hkl_info.invresolsq(n)
-                    res_numpy[n] = r
-                self.column_data['resolution_1/Ang^2'] = res_numpy
+                    res_np[n] = r
+                self.column_data['resolution_1/Ang^2'] = res_np
 

@@ -82,7 +82,11 @@ class Test(unittest.TestCase):
                                 180.20,
                                 places=1)
         assert len(mtz.column_data['resolution_1/Ang^2']) ==\
-            len(mtz.column_data[column_label]['phi'])
+            len(mtz.column_data[column_label]['F'])
+
+        print len(mtz.column_data['resolution_1/Ang^2'])
+        print len(mtz.column_data[column_label]['F'])
+
 
 
 if __name__ == '__main__':

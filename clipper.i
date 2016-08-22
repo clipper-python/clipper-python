@@ -20,6 +20,13 @@
 //%rename(clipper_Range) clipper::Range;
 //%rename(clipper_Batch) clipper::datatypes::Batch;
 
+%rename(SFscale_aniso_TYPE_float) clipper::SFscale_aniso<float>::TYPE;
+%rename(SFscale_aniso_MODE_float) clipper::SFscale_aniso<float>::MODE;
+%rename(SFscale_aniso_F_float) clipper::SFscale_aniso<float>::F;
+%rename(SFscale_aniso_I_float) clipper::SFscale_aniso<float>::I;
+%rename(SFscale_aniso_NORMAL_float) clipper::SFscale_aniso<float>::NORMAL;
+%rename(SFscale_aniso_SHARPEN_float) clipper::SFscale_aniso<float>::SHARPEN;
+%rename(SFscale_aniso_UNSHARPEN_float) clipper::SFscale_aniso<float>::UNSHARPEN;
 %rename(MMonomer_TYPE) clipper::MMonomer::TYPE;
 %rename(MMDBManager_TYPE) clipper::MMDBManager::TYPE;
 
@@ -153,6 +160,7 @@ namespace std {
     #include "../clipper/contrib/convolution_search.h"
     #include "../clipper/contrib/mapfilter.h"
     #include "../clipper/contrib/originmatch.h"
+    #include "../clipper/contrib/sfscale.h"
 
     namespace clipper 
     {
@@ -899,6 +907,14 @@ namespace clipper {
     }
   }
 
+  %extend U_aniso_orth {
+    std::string __str__( ) { 
+      return (*($self)).format();
+      fail:
+        return "";
+    }
+  }
+
 }
 
 %include "../clipper/mmdb/clipper_mmdb.h"
@@ -1001,6 +1017,18 @@ namespace clipper
       SWIG_exception(SWIG_IndexError, "Index out of bounds");
     }
   }
+
+  %extend HKL_data<clipper::data32::E_sigE> {
+    void scaleBySqrtResolution(const clipper::ResolutionFn &escale){
+      for ( clipper::HKL_data_base::HKL_reference_index ih = (*($self)).first(); !ih.last(); ih.next() )
+        if ( !(*($self))[ih].missing() ) (*($self))[ih].scale( sqrt( escale.f(ih) ) );
+    }
+    void scaleByResolution(const clipper::ResolutionFn &escale){
+      for ( clipper::HKL_data_base::HKL_reference_index ih = (*($self)).first(); !ih.last(); ih.next() )
+        if ( !(*($self))[ih].missing() ) (*($self))[ih].scale( escale.f(ih) );
+    }
+  }
+
   %extend HKL_data<clipper::data32::ABCD> {
     void compute_from_phi_fom(const HKL_data< clipper::datatypes::Phi_fom<float> > &phiw){
       ($self)->compute( phiw, clipper::data32::Compute_abcd_from_phifom() );
@@ -1352,6 +1380,7 @@ namespace clipper
 }
 
 %include "../clipper/contrib/function_object_bases.h"
+%include "../clipper/contrib/sfscale.h"
 namespace clipper {
   %template(SFweight_base_float) SFweight_base<float>;
   %template(SFcalc_base_float) SFcalc_base<float>;
@@ -1363,6 +1392,7 @@ namespace clipper {
   %template(FFFear_base_float) FFFear_base<float>;
   %template(Skeleton_base_float) Skeleton_base<float, float>;
   %template(OriginMatch_base_float) OriginMatch_base<float>;
+  %template (SFscale_aniso_float)  SFscale_aniso<float>;
 }
 %include "../clipper/contrib/sfweight.h"
 namespace clipper {

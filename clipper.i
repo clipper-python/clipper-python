@@ -140,6 +140,7 @@ namespace std {
     #include "../clipper/minimol/minimol.h"
     #include "../clipper/minimol/minimol_io.h"
     #include "../clipper/minimol/minimol_utils.h"
+    #include "../clipper/minimol/minimol_seq.h"
     #include "../clipper/ccp4/ccp4_utils.h"
     #include "../clipper/core/map_utils.h"
     #include "../clipper/core/clipper_stats.h"
@@ -161,6 +162,7 @@ namespace std {
     #include "../clipper/contrib/mapfilter.h"
     #include "../clipper/contrib/originmatch.h"
     #include "../clipper/contrib/sfscale.h"
+    #include "../clipper/core/rotation.h"
 
     namespace clipper 
     {
@@ -622,9 +624,6 @@ namespace clipper {
   %template(Range_double) Range<double>;
 }
 
-
-
-
 //FIXME  - We do not really want to be producing new objects. Wrapping constructor properly would be preferred.
 //         But SWIG does not let me.
 namespace clipper {
@@ -920,6 +919,7 @@ namespace clipper {
 %include "../clipper/mmdb/clipper_mmdb.h"
 %include "../clipper/minimol/minimol.h"
 %include "../clipper/minimol/minimol_io.h"
+%include "../clipper/minimol/minimol_seq.h"
 
 
 namespace clipper {
@@ -1653,3 +1653,6 @@ namespace clipper {
 namespace clipper {
   %template(OriginMatch_float) OriginMatch<float>;
 }
+
+%include "../clipper/core/atomsf.h"
+%include "../clipper/core/rotation.h"

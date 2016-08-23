@@ -123,6 +123,7 @@ namespace std {
 %{
     #include <string>
     #include <limits>
+    #include "../clipper/clipper.h"
     #include "../clipper/core/clipper_types.h"
     #include "../clipper/core/hkl_lookup.h"
     #include "../clipper/core/hkl_info.h"
@@ -1020,6 +1021,37 @@ namespace clipper
     if (myErr) {
       myErr = 0; // clear flag for next time
       SWIG_exception(SWIG_IndexError, "Index out of bounds");
+    }
+  }
+
+  %extend HKL_data<clipper::data32::ABCD> {
+    HKL_data<clipper::datatypes::ABCD<float> > __add__(const HKL_data<clipper::datatypes::ABCD<float> > &h2){
+      HKL_data<clipper::data32::ABCD> ret;
+      ret = *($self)+h2;
+      return ret;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::F_phi> {
+    HKL_data<clipper::datatypes::F_phi<float> > __add__(const HKL_data<clipper::datatypes::F_phi<float> > &h2){
+      HKL_data<clipper::data32::F_phi> ret;
+      ret = *($self)+h2;
+      return ret;
+    }
+    HKL_data<clipper::datatypes::F_phi<float> > __sub__(const HKL_data<clipper::datatypes::F_phi<float> > &h2){
+      HKL_data<clipper::datatypes::F_phi<float> > ret;
+      ret = *($self)-h2;
+      return ret;
+    }
+    HKL_data<clipper::datatypes::F_phi<float> > __neg__(){
+      HKL_data<clipper::datatypes::F_phi<float> > ret;
+      ret = -*($self);
+      return ret;
+    }
+    HKL_data<clipper::datatypes::F_phi<float> > __mult__(const float s){
+      HKL_data<clipper::datatypes::F_phi<float> > ret;
+      ret = *($self)*s;
+      return ret;
     }
   }
 

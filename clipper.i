@@ -1409,6 +1409,114 @@ namespace clipper {
 }
 
 %{
+
+template <typename T> void CopyIfF_sigFRefNotMissing_float(const T &d_in, T &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for (HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if (!d_ref[ih].missing()) {
+      d_out[ih] = d_in[ih.hkl()];
+    } else {
+      d_out[ih].set_null();
+    }
+  }
+}
+
+void CopyIfF_sigFRefNotMissingF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF> &d_in, clipper::HKL_data<clipper::data32::F_sigF> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+    CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
+}
+
+void CopyIfF_sigFRefNotMissingE_sigE_float(const clipper::HKL_data<clipper::data32::E_sigE> &d_in, clipper::HKL_data<clipper::data32::E_sigE> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+    CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
+}
+
+void CopyIfF_sigFRefNotMissingABCD_float(const clipper::HKL_data<clipper::data32::ABCD> &d_in, clipper::HKL_data<clipper::data32::ABCD> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+    CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
+}
+
+void CopyIfF_sigFRefNotMissingPhi_fom_float(const clipper::HKL_data<clipper::data32::Phi_fom> &d_in, clipper::HKL_data<clipper::data32::Phi_fom> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+    CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
+}
+
+void CopyIfF_sigFRefNotMissingF_phi_float(const clipper::HKL_data<clipper::data32::F_phi> &d_in, clipper::HKL_data<clipper::data32::F_phi> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+    CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
+}
+
+void CopyIfF_sigFRefNotMissingFlag_float(const clipper::HKL_data<clipper::data32::Flag> &d_in, clipper::HKL_data<clipper::data32::Flag> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+    CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
+}
+
+void PopulateMatchesF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF> &d_ref, const clipper::HKL_data<clipper::data32::F_sigF> &d, std::vector<clipper::HKL> &matched){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if(d_ref[ih].f()  == d[ih.hkl()].f()  )
+       matched.push_back(ih.hkl());
+    else if (  d_ref[ih].missing()  && d[ih.hkl()].missing()  )
+         matched.push_back(ih.hkl());
+    else
+      std::cout << ih.hkl().format() << " no match " << clipper::String(  d_ref[ih].f() ) << " " <<  clipper::String( d[ih.hkl()].f() ) << "\n";
+  }
+}
+
+void PopulateMatchesE_sigE_float(const clipper::HKL_data<clipper::data32::E_sigE> &d_ref, const clipper::HKL_data<clipper::data32::E_sigE> &d, std::vector<clipper::HKL> &matched){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if(d_ref[ih].E()  == d[ih.hkl()].E()  )
+       matched.push_back(ih.hkl());
+    else if (  d_ref[ih].missing()  && d[ih.hkl()].missing()  )
+         matched.push_back(ih.hkl());
+    else
+      std::cout << ih.hkl().format() << " no match " << clipper::String(  d_ref[ih].E() ) << " " <<  clipper::String( d[ih.hkl()].E() ) << "\n";
+  }
+}
+
+void PopulateMatchesABCD_float(const clipper::HKL_data<clipper::data32::ABCD> &d_ref, const clipper::HKL_data<clipper::data32::ABCD> &d, std::vector<clipper::HKL> &matched){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if(d_ref[ih].a()  == d[ih.hkl()].a()&&d_ref[ih].b()  == d[ih.hkl()].b()&&d_ref[ih].c()  == d[ih.hkl()].c()&&d_ref[ih].d()  == d[ih.hkl()].d())
+       matched.push_back(ih.hkl());
+    else if (  d_ref[ih].missing()  && d[ih.hkl()].missing()  )
+         matched.push_back(ih.hkl());
+    else
+      std::cout << ih.hkl().format() << " no match " << clipper::String(  d_ref[ih].a() ) << " " <<  clipper::String( d[ih.hkl()].a() ) << "\n";
+  }
+}
+
+void PopulateMatchesPhi_fom_float(const clipper::HKL_data<clipper::data32::Phi_fom> &d_ref, const clipper::HKL_data<clipper::data32::Phi_fom> &d, std::vector<clipper::HKL> &matched){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if(d_ref[ih].phi()  == d[ih.hkl()].phi()  )
+       matched.push_back(ih.hkl());
+    else if (  d_ref[ih].missing()  && d[ih.hkl()].missing()  )
+         matched.push_back(ih.hkl());
+    else
+      std::cout << ih.hkl().format() << " no match " << clipper::String(  d_ref[ih].phi() ) << " " <<  clipper::String( d[ih.hkl()].phi() ) << "\n";
+  }
+}
+
+void PopulateMatchesF_phi_float(const clipper::HKL_data<clipper::data32::F_phi> &d_ref, const clipper::HKL_data<clipper::data32::F_phi> &d, std::vector<clipper::HKL> &matched){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if(d_ref[ih].f()  == d[ih.hkl()].f()  )
+       matched.push_back(ih.hkl());
+    else if (  d_ref[ih].missing()  && d[ih.hkl()].missing()  )
+         matched.push_back(ih.hkl());
+    else
+      std::cout << ih.hkl().format() << " no match " << clipper::String(  d_ref[ih].f() ) << " " <<  clipper::String( d[ih.hkl()].f() ) << "\n";
+  }
+}
+
+void PopulateMatchesFlag_float(const clipper::HKL_data<clipper::data32::Flag> &d_ref, const clipper::HKL_data<clipper::data32::Flag> &d, std::vector<clipper::HKL> &matched){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if(d_ref[ih].flag()  == d[ih.hkl()].flag()  )
+       matched.push_back(ih.hkl());
+    else if (  d_ref[ih].missing()  && d[ih.hkl()].missing()  )
+         matched.push_back(ih.hkl());
+    else
+      std::cout << ih.hkl().format() << " no match " << clipper::String(  d_ref[ih].flag() ) << " " <<  clipper::String( d[ih.hkl()].flag() ) << "\n";
+  }
+}
+
 void SetFlagBoth(clipper::HKL_data<clipper::data32::Flag> &flag){
   typedef clipper::HKL_data_base::HKL_reference_index HRI;
   for ( HRI ih = flag.first(); !ih.last(); ih.next() )
@@ -1477,6 +1585,19 @@ void SetData(const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F1, c
   }
 }
 %}
+void CopyIfF_sigFRefNotMissingF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF> &d_in, clipper::HKL_data<clipper::data32::F_sigF> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
+void CopyIfF_sigFRefNotMissingE_sigE_float(const clipper::HKL_data<clipper::data32::E_sigE> &d_in, clipper::HKL_data<clipper::data32::E_sigE> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
+void CopyIfF_sigFRefNotMissingABCD_float(const clipper::HKL_data<clipper::data32::ABCD> &d_in, clipper::HKL_data<clipper::data32::ABCD> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
+void CopyIfF_sigFRefNotMissingPhi_fom_float(const clipper::HKL_data<clipper::data32::Phi_fom> &d_in, clipper::HKL_data<clipper::data32::Phi_fom> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
+void CopyIfF_sigFRefNotMissingF_phi_float(const clipper::HKL_data<clipper::data32::F_phi> &d_in, clipper::HKL_data<clipper::data32::F_phi> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
+void CopyIfF_sigFRefNotMissingFlag_float(const clipper::HKL_data<clipper::data32::Flag> &d_in, clipper::HKL_data<clipper::data32::Flag> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
+
+void PopulateMatchesF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF> &d_ref, const clipper::HKL_data<clipper::data32::F_sigF> &d, std::vector<clipper::HKL> &matched);
+void PopulateMatchesE_sigE_float(const clipper::HKL_data<clipper::data32::E_sigE> &d_ref, const clipper::HKL_data<clipper::data32::E_sigE> &d, std::vector<clipper::HKL> &matched);
+void PopulateMatchesABCD_float(const clipper::HKL_data<clipper::data32::ABCD> &d_ref, const clipper::HKL_data<clipper::data32::ABCD> &d, std::vector<clipper::HKL> &matched);
+void PopulateMatchesPhi_fom_float(const clipper::HKL_data<clipper::data32::Phi_fom> &d_ref, const clipper::HKL_data<clipper::data32::Phi_fom> &d, std::vector<clipper::HKL> &matched);
+void PopulateMatchesF_phi_float(const clipper::HKL_data<clipper::data32::F_phi> &d_ref, const clipper::HKL_data<clipper::data32::F_phi> &d, std::vector<clipper::HKL> &matched);
+void PopulateMatchesFlag_float(const clipper::HKL_data<clipper::data32::Flag> &d_ref, const clipper::HKL_data<clipper::data32::Flag> &d, std::vector<clipper::HKL> &matched);
 void SetFlagBoth(clipper::HKL_data<clipper::data32::Flag> &flag);
 void SetFlagBothIfMissing(clipper::HKL_data<clipper::data32::Flag> &flag, const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &myfsigf, const clipper::HKL_data< clipper::datatypes::Flag > &status, int freeflag);
 void SetData(const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F1, const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F2, const clipper::String &CHECK, const clipper::String &OPS, const clipper::String &ELSE_OPS);

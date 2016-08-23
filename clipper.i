@@ -215,6 +215,7 @@ namespace std
 //   %template(DoubleVector) vector<double>;
 //   %template(DoubleDoubleVector) vector<vector<double> >;
    %template(ClipperStringVector) vector<clipper::String>;
+   %template(HKLVector) vector<clipper::HKL>;
    %template(StringVector) vector<string>;
 }
 

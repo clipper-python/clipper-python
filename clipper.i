@@ -1048,7 +1048,7 @@ namespace clipper
       ret = -*($self);
       return ret;
     }
-    HKL_data<clipper::datatypes::F_phi<float> > __mult__(const float s){
+    HKL_data<clipper::datatypes::F_phi<float> > __mul__(const float s){
       HKL_data<clipper::datatypes::F_phi<float> > ret;
       ret = *($self)*s;
       return ret;

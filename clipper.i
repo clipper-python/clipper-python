@@ -216,6 +216,10 @@ namespace std
 //   %template(DoubleDoubleVector) vector<vector<double> >;
    %template(ClipperStringVector) vector<clipper::String>;
    %template(HKLVector) vector<clipper::HKL>;
+   // Do not know if these 3 will be required.
+   //%template(Coord_orthVector) vector<clipper::Coord_orth>;
+   //%template(MAtomIndexVector) vector<clipper::MAtomIndex>;                 // Dodgy ...?
+   //%template(MAtomIndexSymmetryVector) vector<clipper::MAtomIndexSymmetry>; // Dodgy ...?
    %template(StringVector) vector<string>;
 }
 

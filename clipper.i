@@ -1060,45 +1060,22 @@ namespace clipper
     }
     }
 
-  %extend HKL_data<clipper::data32::ABCD> {
-    HKL_data<clipper::datatypes::ABCD<float> > __add__(const HKL_data<clipper::datatypes::ABCD<float> > &h2){
-      HKL_data<clipper::data32::ABCD> ret;
-      ret = *($self)+h2;
-      return ret;
-    }
-  }
-
   %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __eq__(const int& n){
       return (*($self)) == n;
     }
-  }
-
-  %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __ne__(const int& n){
       return (*($self)) != n;
     }
-  }
-
-  %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __ge__(const int& n){
       return (*($self)) >= n;
     }
-  }
-
-  %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __le__(const int& n){
       return (*($self)) <= n;
     }
-  }
-
-  %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __gt__(const int& n){
       return (*($self)) > n;
     }
-  }
-
-  %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __lt__(const int& n){
       return (*($self)) < n;
     }
@@ -1120,8 +1097,19 @@ namespace clipper
       ret = -*($self);
       return ret;
     }
+  }
+
+  %extend data32::ABCD {
     clipper::datatypes::ABCD<float>  __add__(const clipper::datatypes::ABCD<float> &h2){
       clipper::data32::ABCD ret;
+      ret = *($self)+h2;
+      return ret;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::ABCD> {
+    HKL_data<clipper::datatypes::ABCD<float> > __add__(const HKL_data<clipper::datatypes::ABCD<float> > &h2){
+      HKL_data<clipper::data32::ABCD> ret;
       ret = *($self)+h2;
       return ret;
     }

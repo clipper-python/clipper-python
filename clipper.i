@@ -330,11 +330,11 @@ namespace clipper
     //! apply metric to vector
     inline ftype lengthsq( const Vec3<>& v ) const
       { return ( v[0]*(v[0]*m00 + v[1]*m01 + v[2]*m02) +
-		 v[1]*(v[1]*m11 + v[2]*m12) + v[2]*(v[2]*m22) ); }
+                 v[1]*(v[1]*m11 + v[2]*m12) + v[2]*(v[2]*m22) ); }
     //! apply metric to int vector
     inline ftype lengthsq( const Vec3<int>& v ) const
-      {	ftype h = ftype(v[0]); ftype k = ftype(v[1]); ftype l = ftype(v[2]);
-	return h*(h*m00 + k*m01 + l*m02) + k*(k*m11 + l*m12) + l*(l*m22); }
+      { ftype h = ftype(v[0]); ftype k = ftype(v[1]); ftype l = ftype(v[2]);
+        return h*(h*m00 + k*m01 + l*m02) + k*(k*m11 + l*m12) + l*(l*m22); }
 
     String format() const;  //!< return formatted String representation
   };
@@ -473,9 +473,9 @@ namespace clipper {
 
 namespace clipper {
   %extend RTop_orth {
-	  RTop_orth ( Mat33<ftype>& mat ) {
-		  return new RTop_orth(mat);
-	  }
+        RTop_orth ( Mat33<ftype>& mat ) {
+            return new RTop_orth(mat);
+        }
   }
 
   %extend Vec3<float> {
@@ -978,6 +978,11 @@ namespace clipper {
       void set_flag(bool theFlag) { 
         ($self)->flag() = theFlag;
       }
+      clipper::datatypes::Flag_bool copy(){
+        clipper::datatypes::Flag_bool ret;
+        ret = *($self);
+        return ret;
+      }
     }
     %extend Flag {
       int get_flag() { 
@@ -986,6 +991,11 @@ namespace clipper {
       }
       void set_flag(int theFlag) { 
         ($self)->flag() = theFlag;
+      }
+      clipper::datatypes::Flag copy(){
+        clipper::datatypes::Flag ret;
+        ret = *($self);
+        return ret;
       }
     }
   }
@@ -1060,6 +1070,14 @@ namespace clipper
     }
     }
 
+  %extend HKL_data<clipper::data32::Flag_bool> {
+    HKL_data<clipper::datatypes::Flag_bool>  copy(){
+      HKL_data<clipper::data32::Flag_bool> ret;
+      ret = *($self);
+      return ret;
+    }
+  }
+
   %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __eq__(const int& n){
       return (*($self)) == n;
@@ -1079,9 +1097,46 @@ namespace clipper
     HKL_data<clipper::datatypes::Flag_bool> __lt__(const int& n){
       return (*($self)) < n;
     }
+    HKL_data<clipper::datatypes::Flag>  copy(){
+      HKL_data<clipper::data32::Flag> ret;
+      ret = *($self);
+      return ret;
+    }
   }
 
-  %extend data32::F_phi {
+  %extend datatypes::F_sigF<float> {
+    clipper::datatypes::F_sigF<float>  copy(){
+      clipper::data32::F_sigF ret;
+      ret = *($self);
+      return ret;
+    }
+  }
+
+  %extend datatypes::F_sigF_ano<float> {
+    clipper::datatypes::F_sigF_ano<float>  copy(){
+      clipper::data32::F_sigF_ano ret;
+      ret = *($self);
+      return ret;
+    }
+  }
+
+  %extend datatypes::I_sigI<float> {
+    clipper::datatypes::I_sigI<float>  copy(){
+      clipper::data32::I_sigI ret;
+      ret = *($self);
+      return ret;
+    }
+  }
+
+  %extend datatypes::E_sigE<float> {
+    clipper::datatypes::E_sigE<float>  copy(){
+      clipper::data32::E_sigE ret;
+      ret = *($self);
+      return ret;
+    }
+  }
+
+  %extend datatypes::F_phi<float> {
     clipper::datatypes::F_phi<float>  __add__(const clipper::datatypes::F_phi<float> &h2){
       clipper::data32::F_phi ret;
       ret = *($self)+h2;
@@ -1097,12 +1152,22 @@ namespace clipper
       ret = -*($self);
       return ret;
     }
+    clipper::datatypes::F_phi<float>  copy(){
+      clipper::data32::F_phi ret;
+      ret = *($self);
+      return ret;
+    }
   }
 
-  %extend data32::ABCD {
+  %extend datatypes::ABCD<float> {
     clipper::datatypes::ABCD<float>  __add__(const clipper::datatypes::ABCD<float> &h2){
       clipper::data32::ABCD ret;
       ret = *($self)+h2;
+      return ret;
+    }
+    clipper::datatypes::ABCD<float>  copy(){
+      clipper::data32::ABCD ret;
+      ret = *($self);
       return ret;
     }
   }
@@ -1113,9 +1178,31 @@ namespace clipper
       ret = *($self)+h2;
       return ret;
     }
+    HKL_data<clipper::datatypes::ABCD<float> > copy(){
+      HKL_data<clipper::data32::ABCD> ret;
+      ret = *($self);
+      return ret;
+    }
   }
 
   %extend HKL_data<clipper::data32::F_phi> {
+    HKL_data<clipper::datatypes::F_phi<float> >  copy(){
+      HKL_data<clipper::data32::F_phi> ret;
+      ret = *($self);
+      return ret;
+    }
+    /*
+       This would be nice, but what do I do with memo? 
+       Python way is:
+       memo[id(self)] = result (where result is new class)
+       How on earth can I do this in Python?
+       But without this method os.deepcopy will never work.
+    HKL_data<clipper::datatypes::F_phi<float> >  __deepcopy__(PyObject *memo){
+      HKL_data<clipper::data32::F_phi> ret;
+      ret = *($self);
+      return ret;
+    }
+    */
     HKL_data<clipper::datatypes::F_phi<float> > __add__(const HKL_data<clipper::datatypes::F_phi<float> > &h2){
       HKL_data<clipper::data32::F_phi> ret;
       ret = *($self)+h2;
@@ -1147,6 +1234,11 @@ namespace clipper
       for ( clipper::HKL_data_base::HKL_reference_index ih = (*($self)).first(); !ih.last(); ih.next() )
         if ( !(*($self))[ih].missing() ) (*($self))[ih].scale( escale.f(ih) );
     }
+    HKL_data<clipper::datatypes::E_sigE<float> >  copy(){
+      HKL_data<clipper::data32::E_sigE> ret;
+      ret = *($self);
+      return ret;
+    }
   }
 
   %extend HKL_data<clipper::data32::ABCD> {
@@ -1162,6 +1254,11 @@ namespace clipper
   %extend HKL_data<clipper::data32::Phi_fom> {
     void compute_from_abcd(const HKL_data< clipper::datatypes::ABCD<float> > &abcd) {
       ($self)->compute( abcd, clipper::data32::Compute_phifom_from_abcd() );
+    }
+    HKL_data<clipper::datatypes::Phi_fom<float> >  copy(){
+      HKL_data<clipper::data32::Phi_fom> ret;
+      ret = *($self);
+      return ret;
     }
   }
 
@@ -1180,6 +1277,11 @@ namespace clipper
                                   const HKL_data< clipper::datatypes::F_sigF<float> > &fsigf ) {
       ($self)->compute( fsigf, clipper::data32::Compute_scale_u_aniso_fsigf(scale, u_value) );
     }
+    HKL_data<clipper::datatypes::F_sigF<float> >  copy(){
+      HKL_data<clipper::data32::F_sigF> ret;
+      ret = *($self);
+      return ret;
+    }
   }
 
   %extend HKL_data<clipper::data32::F_sigF_ano> {
@@ -1191,6 +1293,11 @@ namespace clipper
                                   const HKL_data< clipper::datatypes::F_sigF_ano<float> > &fsigfano ) {
       ($self)->compute( fsigfano, clipper::data32::Compute_scale_u_aniso_fsigfano(scale, u_value) );
     }
+    HKL_data<clipper::datatypes::F_sigF_ano<float> >  copy(){
+      HKL_data<clipper::data32::F_sigF_ano> ret;
+      ret = *($self);
+      return ret;
+    }
   }
 
   %extend HKL_data<clipper::data32::I_sigI> {
@@ -1201,6 +1308,11 @@ namespace clipper
     void compute_scale_u_aniso_isigi(float scale, clipper::U_aniso_orth u_value, 
                                   const HKL_data< clipper::datatypes::I_sigI<float> > &isigi ) {
       ($self)->compute( isigi, clipper::data32::Compute_scale_u_aniso_isigi(scale, u_value) );
+    }
+    HKL_data<clipper::datatypes::I_sigI<float> >  copy(){
+      HKL_data<clipper::data32::I_sigI> ret;
+      ret = *($self);
+      return ret;
     }
   }
         

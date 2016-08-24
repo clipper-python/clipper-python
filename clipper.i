@@ -1079,6 +1079,15 @@ namespace clipper
   }
 
   %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::data32::Flag> &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::data32::Flag> &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::data32::Flag> &d1){
+      return (*($self)) & d1;
+    }
     HKL_data<clipper::datatypes::Flag_bool> __eq__(const int& n){
       return (*($self)) == n;
     }

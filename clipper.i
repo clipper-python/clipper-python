@@ -1014,6 +1014,7 @@ namespace clipper
     %template(HKL_data_F_phi_double) HKL_data< clipper::data64::F_phi >;
 
     %template(HKL_data_Flag) HKL_data< clipper::data32::Flag>;
+    %template(HKL_data_Flag_bool) HKL_data< clipper::datatypes::Flag_bool>;
     
     %exception HKL_data_Flag::__getitem__ {
     assert(!myErr);
@@ -1027,6 +1028,65 @@ namespace clipper
   %extend HKL_data<clipper::data32::ABCD> {
     HKL_data<clipper::datatypes::ABCD<float> > __add__(const HKL_data<clipper::datatypes::ABCD<float> > &h2){
       HKL_data<clipper::data32::ABCD> ret;
+      ret = *($self)+h2;
+      return ret;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> __eq__(const int& n){
+      return (*($self)) == n;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> __ne__(const int& n){
+      return (*($self)) != n;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> __ge__(const int& n){
+      return (*($self)) >= n;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> __le__(const int& n){
+      return (*($self)) <= n;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> __gt__(const int& n){
+      return (*($self)) > n;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> __lt__(const int& n){
+      return (*($self)) < n;
+    }
+  }
+
+  %extend data32::F_phi {
+    clipper::datatypes::F_phi<float>  __add__(const clipper::datatypes::F_phi<float> &h2){
+      clipper::data32::F_phi ret;
+      ret = *($self)+h2;
+      return ret;
+    }
+    clipper::datatypes::F_phi<float>  __sub__(const clipper::datatypes::F_phi<float> &h2){
+      clipper::data32::F_phi ret;
+      ret = *($self)-h2;
+      return ret;
+    }
+    clipper::datatypes::F_phi<float>  __neg__(){
+      clipper::data32::F_phi ret;
+      ret = -*($self);
+      return ret;
+    }
+    clipper::datatypes::ABCD<float>  __add__(const clipper::datatypes::ABCD<float> &h2){
+      clipper::data32::ABCD ret;
       ret = *($self)+h2;
       return ret;
     }

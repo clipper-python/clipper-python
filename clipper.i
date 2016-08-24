@@ -930,6 +930,15 @@ namespace clipper {
 
 namespace clipper {
   namespace data64 {
+    %extend Flag_bool {
+      bool get_flag() { 
+        bool theFlag = ($self)->flag();
+        return theFlag;
+      }
+      void set_flag(bool theFlag) { 
+        ($self)->flag() = theFlag;
+      }
+    }
     %extend Flag {
       int get_flag() { 
         int theFlag = ($self)->flag();
@@ -941,6 +950,15 @@ namespace clipper {
     }
   }
   namespace data32 {
+    %extend Flag_bool {
+      bool get_flag() { 
+        bool theFlag = ($self)->flag();
+        return theFlag;
+      }
+      void set_flag(bool theFlag) { 
+        ($self)->flag() = theFlag;
+      }
+    }
     %extend Flag {
       int get_flag() { 
         int theFlag = ($self)->flag();
@@ -952,6 +970,15 @@ namespace clipper {
     }
   }
   namespace datatypes {
+    %extend Flag_bool {
+      bool get_flag() { 
+        bool theFlag = ($self)->flag();
+        return theFlag;
+      }
+      void set_flag(bool theFlag) { 
+        ($self)->flag() = theFlag;
+      }
+    }
     %extend Flag {
       int get_flag() { 
         int theFlag = ($self)->flag();
@@ -1023,7 +1050,15 @@ namespace clipper
       myErr = 0; // clear flag for next time
       SWIG_exception(SWIG_IndexError, "Index out of bounds");
     }
-  }
+    }
+    %exception HKL_data_Flag_bool::__getitem__ {
+    assert(!myErr);
+    $action
+    if (myErr) {
+      myErr = 0; // clear flag for next time
+      SWIG_exception(SWIG_IndexError, "Index out of bounds");
+    }
+    }
 
   %extend HKL_data<clipper::data32::ABCD> {
     HKL_data<clipper::datatypes::ABCD<float> > __add__(const HKL_data<clipper::datatypes::ABCD<float> > &h2){
@@ -1319,6 +1354,51 @@ namespace clipper
   %extend HKL_data<clipper::data32::E_sigE> {
     void compute_from_fsigf(const HKL_data< clipper::datatypes::F_sigF<float> > &fsigf ) {
       ($self)->compute( fsigf, clipper::data32::Compute_EsigE_from_FsigF() );
+    }
+  }
+
+  %extend HKL_data<clipper::datatypes::Flag_bool> {
+    clipper::datatypes::Flag_bool& __getitem__(size_t i) { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      if (i >= sz) {
+        myErr = 1;
+        return (*($self))[0];
+      }
+      return (*($self))[i];
+      fail:
+        return (*($self))[0];
+    }
+    size_t __len__() { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      return sz;
+    }
+  }
+  %extend HKL_data<clipper::data32::Flag_bool> {
+    clipper::data32::Flag_bool& __getitem__(size_t i) { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      if (i >= sz) {
+        myErr = 1;
+        return (*($self))[0];
+      }
+      return (*($self))[i];
+      fail:
+        return (*($self))[0];
+    }
+    size_t __len__() { 
+      size_t sz=0;
+      for ( clipper::HKL_data_base::HKL_reference_index ih = ($self)->first(); !ih.last(); ih.next() ){
+        sz++;
+      }
+      return sz;
     }
   }
  

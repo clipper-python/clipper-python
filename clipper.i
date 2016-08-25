@@ -1078,7 +1078,149 @@ namespace clipper
     }
   }
 
+  // Flag works, all others do not (fall over in Python).
+  %extend HKL_data<clipper::data32::F_phi> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::F_phi<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::F_phi<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::F_phi<float> > &d1){
+      return (*($self)) & d1;
+    }
+  }
+
+  %extend HKL_data<clipper::datatypes::F_sigF<float> > {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::F_sigF<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::F_sigF<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::F_sigF<float> > &d1){
+      return (*($self)) & d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::data32::F_sigF> &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::data32::F_sigF> &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::data32::F_sigF> &d1){
+      return (*($self)) & d1;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::F_sigF> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::F_sigF<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::F_sigF<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::F_sigF<float> > &d1){
+      return (*($self)) & d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::data32::F_sigF> &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::data32::F_sigF> &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::data32::F_sigF> &d1){
+      return (*($self)) & d1;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::F_sigF_ano> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::F_sigF_ano<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::F_sigF_ano<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::F_sigF_ano<float> > &d1){
+      return (*($self)) & d1;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::I_sigI> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::I_sigI<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::I_sigI<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::I_sigI<float> > &d1){
+      return (*($self)) & d1;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::E_sigE> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::E_sigE<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::E_sigE<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::E_sigE<float> > &d1){
+      return (*($self)) & d1;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::ABCD> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::ABCD<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::ABCD<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::ABCD<float> > &d1){
+      return (*($self)) & d1;
+    }
+  }
+
+  %extend HKL_data<clipper::data32::Phi_fom> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::datatypes::Phi_fom<float> > &d1){
+      return (*($self)) | d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __xor__(const HKL_data<clipper::datatypes::Phi_fom<float> > &d1){
+      return (*($self)) ^ d1;
+    }
+    HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::datatypes::Phi_fom<float> > &d1){
+      return (*($self)) & d1;
+    }
+  }
+
   %extend HKL_data<clipper::data32::Flag> {
+    HKL_data<clipper::datatypes::Flag_bool> not_(){
+      return !(*($self));
+    }
     HKL_data<clipper::datatypes::Flag_bool> __or__(const HKL_data<clipper::data32::Flag> &d1){
       return (*($self)) | d1;
     }
@@ -1088,6 +1230,9 @@ namespace clipper
     HKL_data<clipper::datatypes::Flag_bool> __and__(const HKL_data<clipper::data32::Flag> &d1){
       return (*($self)) & d1;
     }
+  }
+
+  %extend HKL_data<clipper::data32::Flag> {
     HKL_data<clipper::datatypes::Flag_bool> __eq__(const int& n){
       return (*($self)) == n;
     }

@@ -1840,6 +1840,35 @@ namespace clipper {
 
 %{
 
+template <typename T> void CopyOverHKLInfo(const T &d_in, T &d_out,  const clipper::HKL_info &newhkl){
+  HKL_info::HKL_reference_index ih;
+  for ( ih = newhkl.first(); !ih.last(); ih.next() ) {
+    d_out[ih] = d_in[ih.hkl()];
+  }
+}
+
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_sigF> &d_in, clipper::HKL_data<clipper::data32::F_sigF> &d_out,  const clipper::HKL_info &newhkl){
+    CopyOverHKLInfo(d_in,d_out,newhkl);
+}
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_sigF_ano> &d_in, clipper::HKL_data<clipper::data32::F_sigF_ano> &d_out,  const clipper::HKL_info &newhkl){
+    CopyOverHKLInfo(d_in,d_out,newhkl);
+}
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::E_sigE> &d_in, clipper::HKL_data<clipper::data32::E_sigE> &d_out,  const clipper::HKL_info &newhkl){
+    CopyOverHKLInfo(d_in,d_out,newhkl);
+}
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::ABCD> &d_in, clipper::HKL_data<clipper::data32::ABCD> &d_out,  const clipper::HKL_info &newhkl){
+    CopyOverHKLInfo(d_in,d_out,newhkl);
+}
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::Phi_fom> &d_in, clipper::HKL_data<clipper::data32::Phi_fom> &d_out,  const clipper::HKL_info &newhkl){
+    CopyOverHKLInfo(d_in,d_out,newhkl);
+}
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::Flag> &d_in, clipper::HKL_data<clipper::data32::Flag> &d_out,  const clipper::HKL_info &newhkl){
+    CopyOverHKLInfo(d_in,d_out,newhkl);
+}
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_phi> &d_in, clipper::HKL_data<clipper::data32::F_phi> &d_out,  const clipper::HKL_info &newhkl){
+    CopyOverHKLInfo(d_in,d_out,newhkl);
+}
+
 template <typename T> void CopyIfF_sigFRefNotMissing_float(const T &d_in, T &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
   typedef clipper::HKL_data_base::HKL_reference_index HRI;
   for (HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
@@ -1852,6 +1881,10 @@ template <typename T> void CopyIfF_sigFRefNotMissing_float(const T &d_in, T &d_o
 }
 
 void CopyIfF_sigFRefNotMissingF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF> &d_in, clipper::HKL_data<clipper::data32::F_sigF> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
+    CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
+}
+
+void CopyIfF_sigFRefNotMissingF_sigF_ano_float(const clipper::HKL_data<clipper::data32::F_sigF_ano> &d_in, clipper::HKL_data<clipper::data32::F_sigF_ano> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref){
     CopyIfF_sigFRefNotMissing_float(d_in,d_out,d_ref);
 }
 
@@ -2015,7 +2048,15 @@ void SetData(const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F1, c
   }
 }
 %}
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_sigF> &d_in, clipper::HKL_data<clipper::data32::F_sigF> &d_out,  const clipper::HKL_info &newhkl);
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_sigF_ano> &d_in, clipper::HKL_data<clipper::data32::F_sigF_ano> &d_out,  const clipper::HKL_info &newhkl);
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::E_sigE> &d_in, clipper::HKL_data<clipper::data32::E_sigE> &d_out,  const clipper::HKL_info &newhkl);
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::ABCD> &d_in, clipper::HKL_data<clipper::data32::ABCD> &d_out,  const clipper::HKL_info &newhkl);
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::Phi_fom> &d_in, clipper::HKL_data<clipper::data32::Phi_fom> &d_out,  const clipper::HKL_info &newhkl);
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::Flag> &d_in, clipper::HKL_data<clipper::data32::Flag> &d_out,  const clipper::HKL_info &newhkl);
+void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_phi> &d_in, clipper::HKL_data<clipper::data32::F_phi> &d_out,  const clipper::HKL_info &newhkl);
 void CopyIfF_sigFRefNotMissingF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF> &d_in, clipper::HKL_data<clipper::data32::F_sigF> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
+void CopyIfF_sigFRefNotMissingF_sigF_ano_float(const clipper::HKL_data<clipper::data32::F_sigF_ano> &d_in, clipper::HKL_data<clipper::data32::F_sigF_ano> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
 void CopyIfF_sigFRefNotMissingE_sigE_float(const clipper::HKL_data<clipper::data32::E_sigE> &d_in, clipper::HKL_data<clipper::data32::E_sigE> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
 void CopyIfF_sigFRefNotMissingABCD_float(const clipper::HKL_data<clipper::data32::ABCD> &d_in, clipper::HKL_data<clipper::data32::ABCD> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
 void CopyIfF_sigFRefNotMissingPhi_fom_float(const clipper::HKL_data<clipper::data32::Phi_fom> &d_in, clipper::HKL_data<clipper::data32::Phi_fom> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);

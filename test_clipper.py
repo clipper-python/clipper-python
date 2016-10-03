@@ -46,6 +46,12 @@ print cm.x(), cm.y(), cm.z()
 cif = clipper.CIFfile()
 mydata = clipper.HKL_info()
 
+fphi1 = clipper.HKL_data_F_phi_float(mydata)
+fphi2 = clipper.HKL_data_F_phi_float(mydata)
+
+fphi3 = fphi1 + fphi2*.5
+fphi3p = fphi1 + .5*fphi2
+
 if len(sys.argv)>2:
   cif.open_read (sys.argv[2])
   cif.import_hkl_info(mydata)

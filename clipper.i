@@ -503,7 +503,19 @@ namespace clipper {
     Vec3<float> __mul__ (const Vec3<float> &v) {
       return ((*self)*v);
     };
+    Vec3<float> __rmul__ (const Vec3<float> &v) {
+      return ((*self)*v);
+    };
     clipper::Coord_orth __mul__ (const clipper::Coord_orth &v_) {
+      Vec3<float> v;
+      v[0] = v_[0];
+      v[1] = v_[1];
+      v[2] = v_[2];
+      Vec3<float> v2 = ((*self)*v);
+      Coord_orth c(v2[0],v2[1],v2[2]);
+      return c;
+    };
+    clipper::Coord_orth __rmul__ (const clipper::Coord_orth &v_) {
       Vec3<float> v;
       v[0] = v_[0];
       v[1] = v_[1];
@@ -521,7 +533,19 @@ namespace clipper {
       Coord_frac c(v2[0],v2[1],v2[2]);
       return c;
     };
+    clipper::Coord_frac __rmul__ (const clipper::Coord_frac &v_) {
+      Vec3<float> v;
+      v[0] = v_[0];
+      v[1] = v_[1];
+      v[2] = v_[2];
+      Vec3<float> v2 = ((*self)*v);
+      Coord_frac c(v2[0],v2[1],v2[2]);
+      return c;
+    };
     Mat33<float> __mul__ (const Mat33<float> &m) {
+      return (*self*m);
+    };
+    Mat33<float> __rmul__ (const Mat33<float> &m) {
       return (*self*m);
     };
     Mat33<float> __sub__ (const Mat33<float> &m) {
@@ -743,6 +767,14 @@ namespace clipper {
     {
       return op * (*self);
     }
+    Coord_orth __rmul__ ( const float &factor ) 
+    {
+      return factor * (*self);
+    }
+    Coord_orth __rmul__ ( const RTop_orth& op )
+    {
+      return op * (*self);
+    }
 
   }
   %extend Coord_frac {
@@ -766,6 +798,14 @@ namespace clipper {
       return factor * (*self);
     }
     Coord_frac __mul__ ( const RTop_frac& op )
+    {
+      return op * (*self);
+    }
+    Coord_frac __rmul__ ( const float &factor ) 
+    {
+      return factor * (*self);
+    }
+    Coord_frac __rmul__ ( const RTop_frac& op )
     {
       return op * (*self);
     }
@@ -1373,6 +1413,11 @@ namespace clipper
       return ret;
     }
     HKL_data<clipper::datatypes::F_phi<float> > __mul__(const float s){
+      HKL_data<clipper::datatypes::F_phi<float> > ret;
+      ret = *($self)*s;
+      return ret;
+    }
+    HKL_data<clipper::datatypes::F_phi<float> > __rmul__(const float s){
       HKL_data<clipper::datatypes::F_phi<float> > ret;
       ret = *($self)*s;
       return ret;

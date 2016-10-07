@@ -28,7 +28,7 @@ message(STATUS "Python interpreter: ${PYTHON}")
     message(FATAL_ERROR "Failed to run ${PYTHON}: ${failure}")
   endif()
   message(STATUS "Python sys.prefix: ${_PY_PREFIX}")
-  find_library(PYTHON_LIBRARY NAMES python2.7 python27
+  find_library(PYTHON_LIBRARY NAMES python2.7 python27 python3.5 python35
                HINTS ${_PY_PREFIX}/lib ${_PY_PREFIX}/lib64 ${_PY_PREFIX}/libs
                NO_DEFAULT_PATH)
   if (NOT PYTHON_LIBRARY)
@@ -38,6 +38,7 @@ message(STATUS "Python interpreter: ${PYTHON}")
   find_path(PYTHON_INCLUDE_DIR NAMES Python.h
             HINTS ${_PY_PREFIX}/include
                   ${_PY_PREFIX}/include/python2.7
+                  ${_PY_PREFIX}/include/python3.5m
             NO_DEFAULT_PATH)
   message(STATUS "Python.h is in: ${PYTHON_INCLUDE_DIR}")
   if (NOT PYTHON_INCLUDE_DIR)

@@ -1,9 +1,11 @@
+from __future__ import print_function
 import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__),".."))
 import clipper
 import numpy
 
 import unittest
-import os
 import shutil
 import clipper
 import test_data
@@ -83,7 +85,7 @@ class Test(unittest.TestCase):
         # Convert to 2D array with columns F and sigF
         fsigf_numpy = numpy.reshape(fsigf_numpy, (-1, 2))
         fsigf_numpy = numpy.transpose(fsigf_numpy)
-        print fsigf_numpy.shape
+        print (fsigf_numpy.shape)
         for i in range(10):
             if not numpy.isnan(fsigf_numpy[0][i]):
                 assert fsigf_numpy[0][i] == f_list[i]

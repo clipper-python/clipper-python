@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 import os
 import shutil
@@ -57,28 +58,28 @@ class Test(unittest.TestCase):
 
         # What you get...
         if verbose:
-            print dir(f)
-            print dir(mmol)
+            print (dir(f))
+            print (dir(mmol))
 
         # Get atoms
         atoms = mmol.atom_list()
         if verbose:
-            print dir(atoms)
-            print atoms[0].coord_orth().x()
-            print len(atoms)
+            print (dir(atoms))
+            print (atoms[0].coord_orth().x())
+            print (len(atoms))
 
         # Loop through atoms
         self.assertEqual(len(atoms), 581)
         if verbose:
             for i in range(len(atoms)):
-                print atoms[i]
+                print (atoms[i])
 
         # Get atom coords
         self.assertEqual(atoms[0].coord_orth().x(), -1.975)
         if verbose:
             for at in atoms:
                 c = at.coord_orth()
-                print c.x(), c.y(), c.z()
+                print (c.x(), c.y(), c.z())
 
         # Loop through model, chain, residue, atom
         mod = mmol.model()
@@ -93,11 +94,11 @@ class Test(unittest.TestCase):
         # Access atom directly, set properties
         self.assertEqual(mmol[0][0][0].occupancy(), 1.0)
         mmol[0][0][0].set_occupancy(0.5)
-        print mmol[0][0][0].occupancy()
+        print(mmol[0][0][0].occupancy())
         self.assertEqual(mmol[0][0][0].occupancy(), 0.5)
 
         mmol[0][0][0].set_u_iso(10.0)
-        print mmol[0][0][0].u_iso()
+        print(mmol[0][0][0].u_iso())
         self.assertEqual(mmol[0][0][0].u_iso(), 10.0)
 
 if __name__ == '__main__':

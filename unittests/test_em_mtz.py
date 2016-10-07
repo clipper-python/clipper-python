@@ -7,9 +7,12 @@
 #     CCP-EM Secretary, RAL Laboratory, Harwell, OX11 0FA, UK.
 #
 
+from __future__ import print_function
+import sys
 import unittest
 import os
 import shutil
+sys.path.append(os.path.join(os.path.dirname(__file__),".."))
 from clipper_tools.em import structure_factors
 import numpy
 
@@ -37,7 +40,7 @@ class Test(unittest.TestCase):
             shutil.rmtree(self.test_output)
 
     def test_em_stucture_factors(self):
-        print 'Unit test: EM MTZ I/O'
+        print ('Unit test: EM MTZ I/O')
         mtz_in_path = os.path.join(self.test_data,
                                    'starting_map.mtz')
         mtz = structure_factors.ClipperMTZ(mtz_in_path=mtz_in_path)
@@ -84,8 +87,8 @@ class Test(unittest.TestCase):
         assert len(mtz.column_data['resolution_1/Ang^2']) ==\
             len(mtz.column_data[column_label]['F'])
 
-        print len(mtz.column_data['resolution_1/Ang^2'])
-        print len(mtz.column_data[column_label]['F'])
+        print (len(mtz.column_data['resolution_1/Ang^2']))
+        print (len(mtz.column_data[column_label]['F']))
 
 
 

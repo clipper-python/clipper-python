@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 import sys
 import os
@@ -42,7 +43,7 @@ class Test(unittest.TestCase):
         in question.
         '''
         # Below prints test function name
-        print '\n', sys._getframe().f_code.co_name
+        print ('\n', sys._getframe().f_code.co_name)
         # Below is an example set of assertions.  Please use something similar
         # to test expected output test module.  Unittest module has a wide
         # selection of assert functions, see above documentation for more.

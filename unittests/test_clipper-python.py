@@ -1,6 +1,9 @@
+from __future__ import print_function
+
 import unittest
 import sys
 import os
+sys.path.append(os.path.join(os.path.dirname(__file__),".."))
 try:
     import clipper
 except ImportError:
@@ -23,9 +26,9 @@ def main():
 
     # Check python version >= 2.7
     if sys.version_info < (2, 7):
-        print '\n\nError: please use python >= 2.7'
-        print 'Current python version : ', str(
-            sys.version_info.major) + '.' + str(sys.version_info.minor + '\n')
+        print ('\n\nError: please use python >= 2.7')
+        print ('Current python version : ', str(
+            sys.version_info.major) + '.' + str(sys.version_info.minor + '\n'))
         sys.exit()
     clipper_unittest_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -45,19 +48,19 @@ def main():
     allresults = unittest.TextTestRunner().run(alltests)
 
     # Results review
-    print '\n---- START OF TEST RESULTS'
-    print allresults
-    print '\nallresults::errors'
-    print allresults.errors
-    print '\nallresults::failures'
-    print allresults.failures
-    print '\nallresults::skipped'
-    print allresults.skipped
-    print '\nallresults::successful'
-    print allresults.wasSuccessful()
-    print '\nallresults::test-run'
-    print allresults.testsRun
-    print '\n---- END OF TEST RESULTS'
+    print ('\n---- START OF TEST RESULTS')
+    print (allresults)
+    print ('\nallresults::errors')
+    print (allresults.errors)
+    print ('\nallresults::failures')
+    print (allresults.failures)
+    print ('\nallresults::skipped')
+    print (allresults.skipped)
+    print ('\nallresults::successful')
+    print (allresults.wasSuccessful())
+    print ('\nallresults::test-run')
+    print (allresults.testsRun)
+    print ('\n---- END OF TEST RESULTS')
 
 if __name__ == '__main__':
     main()

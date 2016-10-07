@@ -171,6 +171,7 @@ namespace std {
     }
 
     using namespace clipper;
+    #include <string.h>
 %}
 
 namespace clipper 
@@ -233,8 +234,25 @@ namespace std
 
 %typemap(in) (const clipper::String&)
 {
+%#if PY_MAJOR_VERSION >= 3
+   char *my_result;
+
+   if (PyUnicode_Check($input)) {
+     PyObject * temp_bytes = PyUnicode_AsEncodedString($input, "ASCII", "strict"); // Owned reference
+     if (temp_bytes != NULL) {
+        my_result = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+        my_result = strdup(my_result);
+        Py_DECREF(temp_bytes);
+     } else {
+         std::cout << "Decoding error" << std::endl;
+     }
+   }
+
+   clipper::String *s = new clipper::String(my_result);
+%#else
    std::string ss = PyString_AsString($input);
    clipper::String *s = new clipper::String(ss);
+%#endif
    $1 = s;
 }
 

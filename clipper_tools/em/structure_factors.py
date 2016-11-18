@@ -1,5 +1,5 @@
 #
-#     Copyright (C) 2015 CCP-EM
+#     Copyright (C) 2015-16 CCP-EM
 #
 #     This code is distributed under the terms and conditions of the
 #     CCP-EM Program Suite Licence Agreement as a CCP-EM Application.

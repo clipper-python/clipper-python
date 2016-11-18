@@ -5,7 +5,7 @@
 %include "exception.i"
 %include "std_except.i"
 
-#pragma SWIG nowarn=501,505,401,389,362
+#pragma SWIG nowarn=312,325,361,362,363,389,401,501,505
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -32,6 +32,7 @@
 
 /* THIS IS AN EXAMPLE ON HOW TO USE NUMPY. COMMENT OUT TO USE!*/
 %apply (double* INPLACE_ARRAY1, int DIM1) {(double *test_numpy_a, int test_numpy_n)};
+%apply (double* INPLACE_ARRAY3, int DIM1, int DIM2, int DIM3 ) {(double *numpy_array, int nu, int nv, int nw )}
 /*
 
 %inline 
@@ -128,6 +129,7 @@ namespace std {
     #include "../clipper/core/hkl_lookup.h"
     #include "../clipper/core/hkl_info.h"
     #include "../clipper/core/xmap.h"
+    #include "../clipper/core/nxmap.h"
     #include "../clipper/core/coords.h"
     #include "../clipper/ccp4/ccp4_map_io.h"
     #include "../clipper/ccp4/ccp4_mtz_io.h"
@@ -268,6 +270,8 @@ namespace clipper {
 %include "../clipper/core/clipper_util.h"
 %include "../clipper/core/clipper_types.h"
 
+%template (rtop_float)  clipper::RTop<float>;
+%template (rtop_double) clipper::RTop<double>;
 %template (vec3_int)    clipper::Vec3<int>;
 %template (vec3_float)  clipper::Vec3<float>;
 %template (vec3_double) clipper::Vec3<double>;
@@ -609,6 +613,180 @@ class HKL_reference_index : public HKL_reference_base {
 %include "../clipper/core/xmap.h"
 %include "../clipper/core/nxmap.h"
 
+
+// numpy support for Xmap and NXmap
+// jon is currently editing this code piece
+
+namespace clipper
+{
+    %extend NXmap<float>
+    {
+        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
+            clipper::Grid map_grid = (*($self)).grid();
+            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
+                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
+                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
+                        numpy_array[i] = (*($self))[iw];
+        }
+    
+        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
+            clipper::Grid map_grid = (*($self)).grid();
+            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
+                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
+                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
+                        (*($self))[iw] = numpy_array[i];
+        }
+    
+        RTop<ftype> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
+        RTop<ftype> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
+    
+    }
+    
+    %extend Xmap<float>
+    {
+        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::Xmap_base::Map_reference_index ix;
+            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
+                numpy_array[i] = (*($self))[ix];
+        }
+    
+        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::Xmap_base::Map_reference_index ix;
+            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
+                (*($self))[ix] = numpy_array[i];
+        }
+    }
+    
+    %extend NXmap<double>
+    {
+        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
+            clipper::Grid map_grid = (*($self)).grid();
+            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
+                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
+                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
+                        numpy_array[i] = (*($self))[iw];
+        }
+    
+        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
+            clipper::Grid map_grid = (*($self)).grid();
+            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
+                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
+                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
+                        (*($self))[iw] = numpy_array[i];
+        }
+            
+        RTop<ftype> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
+        RTop<ftype> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
+    }
+    
+    %extend Xmap<double>
+    {
+        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::Xmap_base::Map_reference_index ix;
+            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
+                numpy_array[i] = (*($self))[ix];
+        }
+    
+        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::Xmap_base::Map_reference_index ix;
+            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
+                (*($self))[ix] = numpy_array[i];
+        }
+    }
+}
+
+
+namespace clipper {
+    class Map_reference_base
+    {
+    public:
+      inline const NXmap_base& base_nxmap() const { return *map_; }
+      inline const int& index() const { return index_; }
+      inline bool last() const { return ( index_ >= map_->grid_.size() ); }
+    protected:
+      const NXmap_base* map_;
+      int index_;
+    };
+    
+    
+    class Map_reference_index : public Map_reference_base
+    {
+    public:
+      Map_reference_index() {}
+      explicit Map_reference_index( const NXmap_base& map )
+        { map_ = &map; index_ = 0; }
+      Map_reference_index( const NXmap_base& map, const Coord_grid& pos )
+        { map_ = &map; index_ = map_->grid_.index( pos ); }
+      inline Coord_grid coord() const
+        { return map_->grid_.deindex(index_); }
+      inline const Coord_orth coord_orth() const
+        { return map_->coord_orth( coord().coord_map() ); }
+      inline Map_reference_index& set_coord( const Coord_grid& pos )
+        { index_ = map_->grid_.index( pos ); return *this; }
+      inline Map_reference_index& next() { index_++; return *this; }
+      inline int index_offset(const int& du,const int& dv,const int& dw) const {
+        return index_ + du*map_->du + dv*map_->dv + dw*map_->dw;
+      }
+    };
+    
+    class Map_reference_coord : public Map_reference_base
+    {
+    public:
+      Map_reference_coord() {}
+      explicit Map_reference_coord( const NXmap_base& map )
+        { map_ = &map; }
+      Map_reference_coord( const NXmap_base& map, const Coord_grid& pos )
+        { map_ = &map; set_coord( pos ); }
+      inline Coord_grid coord() const { return pos_; }
+      inline const Coord_orth coord_orth() const
+        { return map_->coord_orth( coord().coord_map() ); }
+      inline Map_reference_coord& set_coord( const Coord_grid& pos )
+        { pos_ = pos; index_ = map_->grid_.index( pos_ ); return *this; }
+      inline Map_reference_coord& next() {
+        index_++;
+        pos_ = map_->grid_.deindex(index_);
+        return *this;
+      }
+      inline Map_reference_coord& next_u() { pos_.u()++; index_ += map_->du; return *this; }
+      inline Map_reference_coord& next_v() { pos_.v()++; index_ += map_->dv; return *this; }
+      inline Map_reference_coord& next_w() { pos_.w()++; index_ += map_->dw; return *this; }
+      inline Map_reference_coord& prev_u() { pos_.u()--; index_ -= map_->du; return *this; }
+      inline Map_reference_coord& prev_v() { pos_.v()--; index_ -= map_->dv; return *this; }
+      inline Map_reference_coord& prev_w() { pos_.w()--; index_ -= map_->dw; return *this; }
+      inline Map_reference_coord& operator =( const Coord_grid& pos )
+        { return set_coord( pos ); }
+    protected:
+      Coord_grid pos_;
+    };
+}
+
+%{
+  namespace clipper {
+    typedef NXmap_base::Map_reference_base Map_reference_base;
+    typedef NXmap_base::Map_reference_index Map_reference_index;
+    typedef NXmap_base::Map_reference_coord Map_reference_coord;
+  }
+%}
 
 
 namespace clipper {
@@ -2312,3 +2490,6 @@ namespace clipper {
 
 %include "../clipper/core/atomsf.h"
 %include "../clipper/core/rotation.h"
+
+
+

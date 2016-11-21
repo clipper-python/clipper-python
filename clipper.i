@@ -2,6 +2,7 @@
 
 %include "std_vector.i"
 %include "std_string.i"
+//%include "std_complex.i"
 %include "exception.i"
 %include "std_except.i"
 
@@ -270,15 +271,11 @@ namespace clipper {
 %include "../clipper/core/clipper_util.h"
 %include "../clipper/core/clipper_types.h"
 
-%template (rtop_float)  clipper::RTop<float>;
-%template (rtop_double) clipper::RTop<double>;
+%template (RTop_float)  clipper::RTop<float>;
+%template (RTop_double) clipper::RTop<double>;
 %template (vec3_int)    clipper::Vec3<int>;
 %template (vec3_float)  clipper::Vec3<float>;
 %template (vec3_double) clipper::Vec3<double>;
-
-//%template (mat33_int)    clipper::Mat33<int>;
-//%template (mat33_double) clipper::Mat33<double>;
-
 
 %inline %{
 namespace clipper {
@@ -619,98 +616,160 @@ class HKL_reference_index : public HKL_reference_base {
 
 namespace clipper
 {
+    %extend RTop<double>
+    {
+        std::string __str__( )
+        {
+            return (*($self)).format();
+            fail: return "";
+        }
+    }
+
+    %extend Mat33<double>
+    {
+        std::string __str__( )
+        {
+            return (*($self)).format();
+            fail: return "";
+        }
+    }
+    
+    %extend Vec3<double>
+    {
+        std::string __str__( )
+        {
+            return (*($self)).format();
+            fail: return "";
+        }
+    }
+
     %extend NXmap<float>
     {
-        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        NXmap ( clipper::Grid const & grid, clipper::RTop<ftype> const & rtop)
         {
-            int i = 0;
-            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
-            clipper::Grid map_grid = (*($self)).grid();
-            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
-                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
-                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
-                        numpy_array[i] = (*($self))[iw];
+            return new NXmap<float>( grid, rtop );
         }
     
-        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        int export_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
-            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
+            clipper::Coord_grid c;
             clipper::Grid map_grid = (*($self)).grid();
-            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
-                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
-                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
-                        (*($self))[iw] = numpy_array[i];
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        numpy_array[i] = (*($self)).get_data(c);
+            return i;
         }
     
-        RTop<ftype> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
-        RTop<ftype> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
+        int import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::Coord_grid c;
+            clipper::Grid map_grid = (*($self)).grid();
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        (*($self)).set_data(c, numpy_array[i]);
+            return i;
+        }
     
     }
     
     %extend Xmap<float>
     {
-        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        int export_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
-            clipper::Xmap_base::Map_reference_index ix;
-            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
-                numpy_array[i] = (*($self))[ix];
+            clipper::Coord_grid c;
+            clipper::Grid map_grid = (*($self)).grid_asu();
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        numpy_array[i] = (*($self)).get_data(c);
+            return i;
         }
     
-        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        int import_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
-            clipper::Xmap_base::Map_reference_index ix;
-            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
-                (*($self))[ix] = numpy_array[i];
+            clipper::Coord_grid c;
+            clipper::Grid map_grid = (*($self)).grid_asu();
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        (*($self)).set_data(c, numpy_array[i]);
+            return i;
         }
     }
     
     %extend NXmap<double>
     {
-        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        NXmap ( clipper::Grid const & grid, clipper::RTop<double> const & rtop)
         {
-            int i = 0;
-            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
-            clipper::Grid map_grid = (*($self)).grid();
-            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
-                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
-                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
-                        numpy_array[i] = (*($self))[iw];
+            return new NXmap<double>( grid, rtop );
         }
     
-        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        int export_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
-            clipper::NXmap_base::Map_reference_coord iu, iv, iw;
+            clipper::Coord_grid c;
             clipper::Grid map_grid = (*($self)).grid();
-            for ( iu = (*($self)).first_coord(); iu.coord().u() < map_grid.nu(); iu.next_u() )
-                for ( iv = iu; iv.coord().v() < map_grid.nv(); iv.next_v() )
-                    for ( iw = iv; iw.coord().w() < map_grid.nw(); iw.next_w(),i++ )
-                        (*($self))[iw] = numpy_array[i];
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        numpy_array[i] = (*($self)).get_data(c);
+            return i;
+        }
+    
+        int import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        {
+            int i = 0;
+            clipper::Coord_grid c;
+            clipper::Grid map_grid = (*($self)).grid();
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        (*($self)).set_data(c, numpy_array[i]);
+            return i;
         }
             
-        RTop<ftype> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
-        RTop<ftype> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
+        RTop<double> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
+        RTop<double> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
     }
     
     %extend Xmap<double>
     {
-        void export_numpy ( double *numpy_array, int nu, int nv, int nw )
+        int export_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
-            clipper::Xmap_base::Map_reference_index ix;
-            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
-                numpy_array[i] = (*($self))[ix];
+            clipper::Coord_grid c;
+            clipper::Grid map_grid = (*($self)).grid_asu();
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        numpy_array[i] = (*($self)).get_data(c);
+            return i;
         }
     
-        void import_numpy ( double *numpy_array, int nu, int nv, int nw )
+        int import_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
-            clipper::Xmap_base::Map_reference_index ix;
-            for ( ix = (*($self)).first(); !ix.last(); ix.next(),i++ )
-                (*($self))[ix] = numpy_array[i];
+            clipper::Coord_grid c;
+            clipper::Grid map_grid = (*($self)).grid_asu();
+        
+            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
+                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
+                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+                        (*($self)).set_data(c, numpy_array[i]);
+            return i;
         }
     }
 }
@@ -1238,13 +1297,9 @@ namespace clipper {
 }
 
 
-/*
+//%rename (to_complex_float) operator complex<float>();
+//%rename (to_complex_double) operator complex<double>();
 
-  The following does not have any effect. We want that renamed! (if possible)
-
-%rename (to_complex_float) operator complex<float>();
-%rename (to_complex_double) operator complex<double>();
-*/
 
 %include "../clipper/core/hkl_datatypes.h"
 

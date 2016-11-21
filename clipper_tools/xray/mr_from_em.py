@@ -14,18 +14,18 @@ from lxml import etree
 #  @param resol estimated resolution (float)
 #  @return a plain text log string, an XML etree and a clipper.HKL_data_F_phi_float object
 
-def structure_factors ( mapin="", resol=8.0, callback=callbacks.flush_log ) :
+def structure_factors ( mapin="", resol=8.0, callback=callbacks.flush_log_and_XML ) :
 
     # create log string so console-based apps get some feedback
     log_string = "\n  >> clipper_tools: mr_from_em.structure_factors"
     log_string += "\n            mapin: %s" % mapin
     log_string += "\n            resol: %s" % resol
-    callbacks.flush_log ( log_string )
 
     # create XML tree, to be merged in a global structured results file
     xml_root = etree.Element('structure_factors')
     xml_root.attrib['mapin'] = mapin
     xml_root.attrib['resol'] = str ( resol )
+    callbacks.flush_log ( log_string )
 
     nxmap = clipper.NXmap_double( )
     map_file = clipper.CCP4MAPfile( )
@@ -40,7 +40,7 @@ def structure_factors ( mapin="", resol=8.0, callback=callbacks.flush_log ) :
     map_file.close_read()
     log_string += "\n  >> file %s has been read" % mapin
     callbacks.flush_log ( log_string )
- 
+
     # get the grid in a local variable for efficiency
     grid = nxmap.grid()
 
@@ -67,7 +67,8 @@ def structure_factors ( mapin="", resol=8.0, callback=callbacks.flush_log ) :
     map_file.export_nxmap_double ( nxmap_zero )
     map_file.close_write()
     log_string += "\n  >> Map file written to disk!"
-
     callbacks.flush_log ( log_string )
+
+    
 
     return log_string,xml_root,nxmap

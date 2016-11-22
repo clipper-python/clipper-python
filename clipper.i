@@ -705,6 +705,8 @@ namespace clipper
                         (*($self)).set_data(c, numpy_array[i]);
             return i;
         }
+    
+    
     }
     
     %extend NXmap<double>
@@ -849,16 +851,33 @@ namespace clipper {
 
 
 namespace clipper {
-  %extend Xmap<float> {
-    void fft_from_float(const clipper::HKL_data<clipper::data32::F_phi> &fb){
-      ($self)->fft_from( fb );
+  %extend Xmap<float>
+  {
+    void fft_from (const clipper::HKL_data<clipper::data32::F_phi> &fb)
+    {
+        ($self)->fft_from( fb );
     }
-  }
-  %extend Xmap<double> {
-    void fft_from_double(const clipper::HKL_data<clipper::data64::F_phi> &fb){
-      ($self)->fft_from( fb );
+    
+    void fft_to (clipper::HKL_data<clipper::data32::F_phi> &fphidata)
+    {
+        ($self)->fft_to(fphidata, clipper::Xmap_base::Default);
     }
+    
   }
+  %extend Xmap<double>
+  {
+    void fft_from (const clipper::HKL_data<clipper::data64::F_phi> &fb)
+    {
+        ($self)->fft_from( fb );
+    }
+    
+    void fft_to (clipper::HKL_data<clipper::data32::F_phi> &fphidata ) const
+    {
+        ($self)->fft_to(fphidata, clipper::Xmap_base::Default);
+    }
+  
+  }
+  
   %template(Xmap_float) Xmap<float>;
   %template(Xmap_double) Xmap<double>;
   %template(Xmap_int) Xmap<int>;

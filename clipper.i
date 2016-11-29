@@ -653,12 +653,18 @@ namespace clipper
         int export_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
+            int top_u, top_v, top_w;
+        
             clipper::Coord_grid c;
             clipper::Grid map_grid = (*($self)).grid();
         
-            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
-                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
-                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+            nu > map_grid.nu() ? top_u = map_grid.nu() : top_u = nu;
+            nv > map_grid.nv() ? top_v = map_grid.nv() : top_v = nv;
+            nw > map_grid.nw() ? top_w = map_grid.nw() : top_w = nw;
+        
+            for ( c.w() = 0; c.w() < top_w; c.w()++ )
+                for ( c.v() = 0; c.v() < top_v; c.v()++ )
+                    for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
                         numpy_array[i] = (*($self)).get_data(c);
             return i;
         }
@@ -666,12 +672,18 @@ namespace clipper
         int import_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
+            int top_u, top_v, top_w;
+        
             clipper::Coord_grid c;
             clipper::Grid map_grid = (*($self)).grid();
         
-            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
-                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
-                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+            nu > map_grid.nu() ? top_u = map_grid.nu() : top_u = nu;
+            nv > map_grid.nv() ? top_v = map_grid.nv() : top_v = nv;
+            nw > map_grid.nw() ? top_w = map_grid.nw() : top_w = nw;
+        
+            for ( c.w() = 0; c.w() < top_w; c.w()++ )
+                for ( c.v() = 0; c.v() < top_v; c.v()++ )
+                    for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
                         (*($self)).set_data(c, numpy_array[i]);
             return i;
         }
@@ -731,12 +743,18 @@ namespace clipper
         int export_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
+            int top_u, top_v, top_w;
+        
             clipper::Coord_grid c;
             clipper::Grid map_grid = (*($self)).grid();
         
-            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
-                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
-                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+            nu > map_grid.nu() ? top_u = map_grid.nu() : top_u = nu;
+            nv > map_grid.nv() ? top_v = map_grid.nv() : top_v = nv;
+            nw > map_grid.nw() ? top_w = map_grid.nw() : top_w = nw;
+        
+            for ( c.w() = 0; c.w() < top_w; c.w()++ )
+                for ( c.v() = 0; c.v() < top_v; c.v()++ )
+                    for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
                         numpy_array[i] = (*($self)).get_data(c);
             return i;
         }
@@ -744,12 +762,18 @@ namespace clipper
         int import_numpy ( double *numpy_array, int nu, int nv, int nw )
         {
             int i = 0;
+            int top_u, top_v, top_w;
+        
             clipper::Coord_grid c;
             clipper::Grid map_grid = (*($self)).grid();
         
-            for ( c.w() = 0; c.w() < map_grid.nw(); c.w()++ )
-                for ( c.v() = 0; c.v() < map_grid.nv(); c.v()++ )
-                    for (  c.u() = 0; c.u() < map_grid.nu(); c.u()++, i++ )
+            nu > map_grid.nu() ? top_u = map_grid.nu() : top_u = nu;
+            nv > map_grid.nv() ? top_v = map_grid.nv() : top_v = nv;
+            nw > map_grid.nw() ? top_w = map_grid.nw() : top_w = nw;
+        
+            for ( c.w() = 0; c.w() < top_w; c.w()++ )
+                for ( c.v() = 0; c.v() < top_v; c.v()++ )
+                    for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
                         (*($self)).set_data(c, numpy_array[i]);
             return i;
         }

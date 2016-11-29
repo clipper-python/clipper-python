@@ -201,6 +201,3 @@ def structure_factors ( mapin="", resol=8.0, fast_extent_determination=True, cal
 
     return log_string,xml_root,f_phi
 
-    def subroutine ( ) :
-        return
-

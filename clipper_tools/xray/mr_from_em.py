@@ -14,7 +14,10 @@ from lxml import etree
 #  @param resol estimated resolution (float)
 #  @return a plain text log string, an XML etree and a clipper.HKL_data_F_phi_float object
 
-def structure_factors ( mapin="", resol=8.0, fast_extent_determination=True, callback=callbacks.interactive_flush ) :
+def prepare_map ( mapin = "",
+                  resol = 8.0,
+                  output_intermediate_files = False,
+                  callback = callbacks.interactive_flush ) :
 
     ## Reads numpy array, determines the extent of the electron density
     #  @param numpy_in a numpy array containing grid points
@@ -107,9 +110,6 @@ def structure_factors ( mapin="", resol=8.0, fast_extent_determination=True, cal
     log_string += "\n  >> file %s has been read" % mapin
     callback( log_string, xml_root )
 
-    # get the grid in a local variable for efficiency
-    grid = nxmap.grid()
-
     # get map content in a numpy data structure
     import numpy
     map_numpy = numpy.zeros( (nxmap.grid().nu(), nxmap.grid().nv(), nxmap.grid().nw()), dtype='double')
@@ -121,7 +121,15 @@ def structure_factors ( mapin="", resol=8.0, fast_extent_determination=True, cal
     data_points = nxmap.export_numpy ( map_numpy )
     log_string += "\n  >> %i data points have been exported" % data_points
     callback ( log_string, xml_root )
-    rtop_zero = clipper.RTop_double(nxmap.operator_orth_grid().rot())
+
+
+    # MOVE HERE THE INTERESTING STUFF
+
+
+    # END MOVE
+
+    origin_trans = clipper.vec3_double ( 0.0, 0.0, 0.0 )
+    rtop_zero = clipper.RTop_double(nxmap.operator_orth_grid().rot(), origin_trans )
     log_string += "\n  >> moving origin..."
     log_string += "\n     original translation: %s  new origin: %s" % (nxmap.operator_orth_grid().trn(), rtop_zero.trn())
     callback( log_string, xml_root )
@@ -167,19 +175,24 @@ def structure_factors ( mapin="", resol=8.0, fast_extent_determination=True, cal
 
     large_xmap = clipper.Xmap_double ( sg, large_p1_cell, large_grid_sampling )
 
-    log_string += "\n  >> new grid: nu=%i nv=%i nw=%i" % (large_xmap.grid_asu().nu(), \
-                                                          large_xmap.grid_asu().nv(), \
-                                                          large_xmap.grid_asu().nw() )
+    log_string += "\n  >> new grid: nu=%i nv=%i nw=%i" % ( large_xmap.grid_asu().nu(),
+                                                           large_xmap.grid_asu().nv(),
+                                                           large_xmap.grid_asu().nw() )
 
     log_string += "\n  >> putting map into a large p1 cell..."
     log_string += "\n  >> new cell parameters: %s" % large_p1_cell.format()
     callback( log_string, xml_root )
 
-    large_xmap.import_numpy ( map_numpy )
-
     # create HKL_info using user-supplied resolution parameter
     resolution = clipper.Resolution ( resol )
     hkl_info = clipper.HKL_info (sg, large_p1_cell, resolution, True )
+
+    start = clipper.Coord_grid ( 0, 0, 0 )
+    end   = clipper.Coord_grid ( new_xmap.grid_asu().nu(),
+                                 new_xmap.grid_asu().nv(),
+                                 new_xmap.grid_asu().nw()  )
+
+    large_xmap.import_numpy ( map_numpy )
 
     # fft the map
     f_phi = clipper.HKL_data_F_phi_float( hkl_info, large_p1_cell )

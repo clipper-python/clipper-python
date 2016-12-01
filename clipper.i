@@ -730,6 +730,35 @@ namespace clipper
             return i;
         }
     
+        int export_section_numpy ( double *numpy_array, int nu, int nv, int nw, clipper::Coord_grid& start, clipper::Coord_grid& end )
+        {
+            int i = 0;
+            int w, v;
+            clipper::Xmap_base::Map_reference_coord ix( (*($self)) );
+        
+            for ( w = start.w(); w <= end.w(); w++ )
+                for ( v = start.v(); v <= end.v(); v++ )
+                    for ( ix.set_coord(Coord_grid(start.u(),v,w)); ix.coord().u() <= end.u(); ix.next_u(), i++ )
+                    {
+                        numpy_array[i] = (*($self)).get_data(ix.coord());
+                    }
+            return i;
+        }
+    
+        int import_section_numpy ( double *numpy_array, int nu, int nv, int nw, clipper::Coord_grid& start, clipper::Coord_grid& end )
+        {
+            int i = 0;
+            int w, v;
+            clipper::Xmap_base::Map_reference_coord ix( (*($self)) );
+        
+            for ( w = start.w(); w <= end.w(); w++ )
+                for ( v = start.v(); v <= end.v(); v++ )
+                    for ( ix.set_coord(Coord_grid(start.u(),v,w)); ix.coord().u() <= end.u(); ix.next_u(), i++ )
+                    {
+                        (*($self)).set_data(ix.coord(), numpy_array[i]);
+                    }
+            return i;
+        }
     
     }
     
@@ -819,6 +848,36 @@ namespace clipper
                 for ( c.v() = 0; c.v() < top_v; c.v()++ )
                     for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
                         (*($self)).set_data(c, numpy_array[i]);
+            return i;
+        }
+    
+        int export_section_numpy ( double *numpy_array, int nu, int nv, int nw, clipper::Coord_grid& start, clipper::Coord_grid& end )
+        {
+            int i = 0;
+            int w, v;
+            clipper::Xmap_base::Map_reference_coord ix( (*($self)) );
+        
+            for ( w = start.w(); w <= end.w(); w++ )
+                for ( v = start.v(); v <= end.v(); v++ )
+                    for ( ix.set_coord(Coord_grid(start.u(),v,w)); ix.coord().u() <= end.u(); ix.next_u(), i++ )
+                    {
+                        numpy_array[i] = (*($self)).get_data(ix.coord());
+                    }
+            return i;
+        }
+    
+        int import_section_numpy ( double *numpy_array, int nu, int nv, int nw, clipper::Coord_grid& start, clipper::Coord_grid& end )
+        {
+            int i = 0;
+            int w, v;
+            clipper::Xmap_base::Map_reference_coord ix( (*($self)) );
+        
+            for ( w = start.w(); w <= end.w(); w++ )
+                for ( v = start.v(); v <= end.v(); v++ )
+                    for ( ix.set_coord(Coord_grid(start.u(),v,w)); ix.coord().u() <= end.u(); ix.next_u(), i++ )
+                    {
+                        (*($self)).set_data(ix.coord(), numpy_array[i]);
+                    }
             return i;
         }
     }

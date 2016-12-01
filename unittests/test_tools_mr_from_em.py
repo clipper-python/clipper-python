@@ -5,7 +5,7 @@ import clipper
 import test_data
 import clipper
 import clipper_tools
-from clipper_tools.xray.mr_from_em import structure_factors
+from clipper_tools.xray.mr_from_em import prepare_map
 
 
 class Test(unittest.TestCase):
@@ -31,8 +31,11 @@ class Test(unittest.TestCase):
 
     def test_tools_mr_from_em(self, verbose=False):
         
-        map_input = os.path.join(self.test_data_path, 'emd_3407.mrc')
-        log, xml, fphi = structure_factors ( mapin=map_input, resol=3.3 )
+        inputs = { os.path.join(self.test_data_path, 'emd_3407.mrc') : 3.3,
+                   os.path.join(self.test_data_path, 'emd_5314.mrc') : 8.8 }
+        
+        for input, resolution in inputs.items() :
+            log, xml, fphi = prepare_map ( input, resolution )
 
 if __name__ == '__main__':
     unittest.main()

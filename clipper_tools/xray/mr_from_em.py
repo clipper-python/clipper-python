@@ -98,6 +98,7 @@ def prepare_map ( mapin = "",
     nxmap = clipper.NXmap_double( )
     map_file = clipper.CCP4MAPfile( )
     sg = clipper.Spacegroup.p1()
+    resolution = clipper.Resolution ( resol )
 
     # nothing in, nothing out
     if mapin == "" :
@@ -121,23 +122,33 @@ def prepare_map ( mapin = "",
     data_points = nxmap.export_numpy ( map_numpy )
     log_string += "\n  >> %i data points have been exported" % data_points
     callback ( log_string, xml_root )
+    map_mean = numpy.mean(map_numpy)
+    map_stdv = numpy.std(map_numpy)
 
+    log_string += "\n  >> map mean (stdev): %.4f (%.4f)" % (map_mean, map_stdv)
 
-    # MOVE HERE THE INTERESTING STUFF
-
-
-    # END MOVE
-
-    origin_trans = clipper.vec3_double ( 0.0, 0.0, 0.0 )
-    rtop_zero = clipper.RTop_double(nxmap.operator_orth_grid().rot(), origin_trans )
-    log_string += "\n  >> moving origin..."
-    log_string += "\n     original translation: %s  new origin: %s" % (nxmap.operator_orth_grid().trn(), rtop_zero.trn())
-    callback( log_string, xml_root )
-
+    # compute the extent
+    extent, temp_log = determine_extent ( map_numpy, 20 )
+    log_string += temp_log
+    extent_list = [ extent[1] - extent[0], extent[3] - extent[2], extent[5] - extent[4] ]
+    max_extent = max(extent_list)
+    
     # create new map with origin in zero and import numpy array
+    origin_trans = clipper.vec3_double ( - extent[0] - max_extent/2.0,
+                                         - extent[2] - max_extent/2.0,
+                                         - extent[4] - max_extent/2.0)
+
+    rtop_zero = clipper.RTop_double(nxmap.operator_orth_grid().rot(), origin_trans )
+    
+
     nxmap_zero = clipper.NXmap_double(nxmap.grid(), rtop_zero )
+
     data_points = nxmap_zero.import_numpy ( map_numpy )
     log_string += "\n  >> %i data points have been imported from numpy" % data_points
+    callback( log_string, xml_root )
+
+    log_string += "\n  >> moving origin..."
+    log_string += "\n     original translation: %s  new origin: %s" % (nxmap.operator_orth_grid().trn(), rtop_zero.trn())
     callback( log_string, xml_root )
 
     # dump map to disk
@@ -153,12 +164,6 @@ def prepare_map ( mapin = "",
     map_file.import_xmap_double ( new_xmap )
     map_file.close_read()
 
-    # compute the extent
-    extent, temp_log = determine_extent ( map_numpy, 20 )
-    log_string += temp_log
-    extent_list = [ extent[1] - extent[0], extent[3] - extent[2], extent[5] - extent[4] ]
-    max_extent = max(extent_list)
-
     callback ( log_string, xml_root )
 
     large_a = ( new_xmap.cell().a() * ( max_extent + new_xmap.grid_asu().nu())) / new_xmap.grid_asu().nu()
@@ -169,8 +174,8 @@ def prepare_map ( mapin = "",
                   new_xmap.cell().alpha(), new_xmap.cell().beta(), new_xmap.cell().gamma() )
 
     large_p1_cell = clipper.Cell ( cell_desc )
-    large_grid_sampling = clipper.Grid_sampling ( max_extent + new_xmap.grid_asu().nu(),\
-                                                  max_extent + new_xmap.grid_asu().nv(),\
+    large_grid_sampling = clipper.Grid_sampling ( max_extent + new_xmap.grid_asu().nu(),
+                                                  max_extent + new_xmap.grid_asu().nv(),
                                                   max_extent + new_xmap.grid_asu().nw() )
 
     large_xmap = clipper.Xmap_double ( sg, large_p1_cell, large_grid_sampling )
@@ -183,21 +188,32 @@ def prepare_map ( mapin = "",
     log_string += "\n  >> new cell parameters: %s" % large_p1_cell.format()
     callback( log_string, xml_root )
 
-    # create HKL_info using user-supplied resolution parameter
-    resolution = clipper.Resolution ( resol )
-    hkl_info = clipper.HKL_info (sg, large_p1_cell, resolution, True )
 
-    start = clipper.Coord_grid ( 0, 0, 0 )
-    end   = clipper.Coord_grid ( new_xmap.grid_asu().nu(),
-                                 new_xmap.grid_asu().nv(),
-                                 new_xmap.grid_asu().nw()  )
+    map_numpy = numpy.zeros( (large_xmap.grid_asu().nu(),
+                              large_xmap.grid_asu().nv(),
+                              large_xmap.grid_asu().nw()), dtype='double' )
 
+
+    new_xmap.export_numpy ( map_numpy )
+    log_string += "\n  >> map mean after resizing: %.4f" % numpy.mean(map_numpy)
     large_xmap.import_numpy ( map_numpy )
+
+    # dump map to disk
+    map_file = clipper.CCP4MAPfile()
+    map_file.open_write ( "mapout_zero_large.mrc" )
+    map_file.export_xmap_double ( large_xmap )
+    map_file.close_write()
+    log_string += "\n  >> map file written to disk"
+    callback( log_string, xml_root )
+
+    # create HKL_info using user-supplied resolution parameter
+    hkl_info = clipper.HKL_info (sg, large_p1_cell, resolution, True )
 
     # fft the map
     f_phi = clipper.HKL_data_F_phi_float( hkl_info, large_p1_cell )
     log_string += "\n  >> now computing map coefficients to %0.1f A resolution..." % resol
     callback( log_string, xml_root )
+    
     large_xmap.fft_to ( f_phi )
     log_string += "\n  >> writing coefficients to MTZ file..."
     callback( log_string, xml_root )

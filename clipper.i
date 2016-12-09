@@ -688,6 +688,9 @@ namespace clipper
             return i;
         }
     
+        RTop<ftype> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
+        RTop<ftype> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
+    
     }
     
     %extend Xmap<float>
@@ -706,8 +709,13 @@ namespace clipper
         
             for ( c.w() = 0; c.w() < top_w; c.w()++ )
                 for ( c.v() = 0; c.v() < top_v; c.v()++ )
-                    for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
-                        numpy_array[i] = (*($self)).get_data(c);
+                    for ( c.u() = 0; c.u() < nu; c.u()++, i++ )
+                    {
+                        if ( c.u() < map_grid.nu() && c.v() < map_grid.nv() && c.w() < map_grid.nw() )
+                            numpy_array[i] = (*($self)).get_data(c);
+                        else
+                            numpy_array[i] = 0.0;
+                    }
             return i;
         }
     
@@ -760,6 +768,9 @@ namespace clipper
             return i;
         }
     
+        RTop<ftype> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
+        RTop<ftype> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
+    
     }
     
     %extend NXmap<double>
@@ -783,8 +794,13 @@ namespace clipper
         
             for ( c.w() = 0; c.w() < top_w; c.w()++ )
                 for ( c.v() = 0; c.v() < top_v; c.v()++ )
-                    for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
-                        numpy_array[i] = (*($self)).get_data(c);
+                    for ( c.u() = 0; c.u() < nu; c.u()++, i++ )
+                    {
+                        if ( c.u() < map_grid.nu() && c.v() < map_grid.nv() && c.w() < map_grid.nw() )
+                            numpy_array[i] = (*($self)).get_data(c);
+                        else
+                            numpy_array[i] = 0.0;
+                    }
             return i;
         }
     
@@ -821,14 +837,15 @@ namespace clipper
             clipper::Coord_grid c;
             clipper::Grid map_grid = (*($self)).grid_asu();
         
-            nu > map_grid.nu() ? top_u = map_grid.nu() : top_u = nu;
-            nv > map_grid.nv() ? top_v = map_grid.nv() : top_v = nv;
-            nw > map_grid.nw() ? top_w = map_grid.nw() : top_w = nw;
-        
-            for ( c.w() = 0; c.w() < top_w; c.w()++ )
-                for ( c.v() = 0; c.v() < top_v; c.v()++ )
-                    for (  c.u() = 0; c.u() < top_u; c.u()++, i++ )
-                        numpy_array[i] = (*($self)).get_data(c);
+            for ( c.w() = 0; c.w() < nw; c.w()++ )
+                for ( c.v() = 0; c.v() < nv; c.v()++ )
+                    for ( c.u() = 0; c.u() < nu; c.u()++, i++ )
+                    {
+                        if ( c.u() < map_grid.nu() && c.v() < map_grid.nv() && c.w() < map_grid.nw() )
+                            numpy_array[i] = (*($self)).get_data(c);
+                        else
+                            numpy_array[i] = 0.0;
+                    }
             return i;
         }
     
@@ -858,11 +875,11 @@ namespace clipper
             clipper::Xmap_base::Map_reference_coord ix( (*($self)) );
         
             for ( w = start.w(); w <= end.w(); w++ )
+            {
                 for ( v = start.v(); v <= end.v(); v++ )
                     for ( ix.set_coord(Coord_grid(start.u(),v,w)); ix.coord().u() <= end.u(); ix.next_u(), i++ )
-                    {
                         numpy_array[i] = (*($self)).get_data(ix.coord());
-                    }
+            }
             return i;
         }
     
@@ -873,13 +890,18 @@ namespace clipper
             clipper::Xmap_base::Map_reference_coord ix( (*($self)) );
         
             for ( w = start.w(); w <= end.w(); w++ )
+            {
                 for ( v = start.v(); v <= end.v(); v++ )
                     for ( ix.set_coord(Coord_grid(start.u(),v,w)); ix.coord().u() <= end.u(); ix.next_u(), i++ )
                     {
                         (*($self)).set_data(ix.coord(), numpy_array[i]);
                     }
+            }
             return i;
         }
+    
+        RTop<double> operator_orth_grid () { return (*($self)).operator_orth_grid(); }
+        RTop<double> operator_grid_orth () { return (*($self)).operator_grid_orth(); }
     }
 }
 

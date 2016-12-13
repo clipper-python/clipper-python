@@ -31,7 +31,7 @@ class Test(unittest.TestCase):
 
     def test_tools_mr_from_em(self, verbose=False):
         
-        inputs = { # os.path.join(self.test_data_path, 'emd_3407.mrc') : 3.3,
+        inputs = { os.path.join(self.test_data_path, 'emd_3407.mrc') : 3.3 ,
                    os.path.join(self.test_data_path, 'emd_5314.mrc') : 8.8 }
         
         for input, resolution in inputs.items() :

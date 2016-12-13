@@ -491,10 +491,12 @@ namespace clipper {
 
 
 namespace clipper {
-  %extend RTop_orth {
-        RTop_orth ( Mat33<ftype>& mat ) {
-            return new RTop_orth(mat);
-        }
+  %extend RTop_orth
+  {
+    RTop_orth ( Mat33<ftype>& mat )
+    {
+      return new RTop_orth(mat);
+    }
   }
 
   %extend Vec3<float> {
@@ -617,6 +619,24 @@ class HKL_reference_index : public HKL_reference_base {
 namespace clipper
 {
     %extend RTop<double>
+    {
+        std::string __str__( )
+        {
+            return (*($self)).format();
+            fail: return "";
+        }
+    }
+
+    %extend Mat33<ftype>
+    {
+        std::string __str__( )
+        {
+            return (*($self)).format();
+            fail: return "";
+        }
+    }
+    
+    %extend Vec3<ftype>
     {
         std::string __str__( )
         {

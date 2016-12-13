@@ -1,5 +1,6 @@
 #
 #  Copyright 2016 Jon Agirre & The University of York
+#  Developed at York Structural Biology Laboratory - Cowtan group
 #  Distributed under the terms of the LGPL (www.fsf.org)
 #
 #  Package containing functions for making it easy to do MR with cryoEM maps
@@ -9,14 +10,14 @@ import clipper
 from clipper_tools import callbacks
 from lxml import etree
 
-## Reads EM map, sets origin to 0 and computes structure factors
+## Reads EM map, sets origin to 0, pads cell and computes finely-sampled structure factors
 #  @param mapin string path to a map that will be read into a clipper.NXmap_float object
 #  @param resol estimated resolution (float)
+#  @param callback a function that takes care of log string and xml flushing
 #  @return a plain text log string, an XML etree and a clipper.HKL_data_F_phi_float object
 
 def prepare_map ( mapin = "",
                   resol = 8.0,
-                  output_intermediate_files = False,
                   callback = callbacks.interactive_flush ) :
 
     ## Reads numpy array, determines the extent of the electron density
@@ -82,7 +83,10 @@ def prepare_map ( mapin = "",
         extent = [ min_u, max_u, min_v, max_v, min_w, max_w ]
         
         return extent, log_string
+    
+        ################# end determine_extent ################
 
+    ############### main function ################
 
     # create log string so console-based apps get some feedback
     log_string = "\n  >> clipper_tools: mr_from_em.structure_factors"
@@ -96,29 +100,39 @@ def prepare_map ( mapin = "",
     callback( log_string, xml_root  )
 
     nxmap = clipper.NXmap_double( )
+    xmap  = clipper.Xmap_double ( )
     map_file = clipper.CCP4MAPfile( )
     sg = clipper.Spacegroup.p1()
+    resol *= 0.9
     resolution = clipper.Resolution ( resol )
 
     # nothing in, nothing out
     if mapin == "" :
         return log_string,xml_root,None
     
-    # read the cryoEM map
+    # read the cryoEM map into nxmap, get map data irrespective of origin
     map_file.open_read ( mapin )
     map_file.import_nxmap_double ( nxmap )
     map_file.close_read()
-    log_string += "\n  >> file %s has been read" % mapin
+    log_string += "\n  >> file %s has been read as nxmap" % mapin
     callback( log_string, xml_root )
 
-    # get map content in a numpy data structure
+    # read the cryoEM map into xmap to get cell dimensions, etc.
+    map_file.open_read ( mapin )
+    map_file.import_xmap_double ( xmap )
+    map_file.close_read()
+    log_string += "\n  >> file %s has been read as xmap" % mapin
+    callback( log_string, xml_root )
+    log_string += "\n  >> cell parameters: %s" % xmap.cell().format()
+    log_string += "\n     original translation: %s" % nxmap.operator_orth_grid().trn()
+
+    # put map content in a numpy data structure
     import numpy
     map_numpy = numpy.zeros( (nxmap.grid().nu(), nxmap.grid().nv(), nxmap.grid().nw()), dtype='double')
     log_string += "\n  >> exporting a numpy array of %i x %i x %i grid points" \
                % (nxmap.grid().nu(), nxmap.grid().nv(), nxmap.grid().nw())
     callback( log_string, xml_root  )
 
-    # export data to numpy
     data_points = nxmap.export_numpy ( map_numpy )
     log_string += "\n  >> %i data points have been exported" % data_points
     callback ( log_string, xml_root )
@@ -128,55 +142,27 @@ def prepare_map ( mapin = "",
     log_string += "\n  >> map mean (stdev): %.4f (%.4f)" % (map_mean, map_stdv)
 
     # compute the extent
-    extent, temp_log = determine_extent ( map_numpy, 20 )
+    extent, temp_log = determine_extent ( map_numpy, 30 )
     log_string += temp_log
     extent_list = [ extent[1] - extent[0], extent[3] - extent[2], extent[5] - extent[4] ]
     max_extent = max(extent_list)
     
-    # create new map with origin in zero and import numpy array
-    origin_trans = clipper.vec3_double ( - extent[0] - max_extent/2.0,
-                                         - extent[2] - max_extent/2.0,
-                                         - extent[4] - max_extent/2.0)
+    # create padded xmap and import numpy array
+    origin_trans = clipper.vec3_double(extent[0]+((extent[1]-extent[0])/2),
+                                       extent[2]+((extent[3]-extent[2])/2),
+                                       extent[4]+((extent[5]-extent[4])/2))
 
-    rtop_zero = clipper.RTop_double(nxmap.operator_orth_grid().rot(), origin_trans )
-    
-
-    nxmap_zero = clipper.NXmap_double(nxmap.grid(), rtop_zero )
-
-    data_points = nxmap_zero.import_numpy ( map_numpy )
-    log_string += "\n  >> %i data points have been imported from numpy" % data_points
-    callback( log_string, xml_root )
-
-    log_string += "\n  >> moving origin..."
-    log_string += "\n     original translation: %s  new origin: %s" % (nxmap.operator_orth_grid().trn(), rtop_zero.trn())
-    callback( log_string, xml_root )
-
-    # dump map to disk
-    map_file.open_write ( "mapout_zero.mrc" )
-    map_file.export_nxmap_double ( nxmap_zero )
-    map_file.close_write()
-    log_string += "\n  >> map file written to disk"
-    callback( log_string, xml_root )
-
-    # read it back to an xmap so we can fft-it
-    new_xmap = clipper.Xmap_double ()
-    map_file.open_read ( "mapout_zero.mrc" )
-    map_file.import_xmap_double ( new_xmap )
-    map_file.close_read()
-
-    callback ( log_string, xml_root )
-
-    large_a = ( new_xmap.cell().a() * ( max_extent + new_xmap.grid_asu().nu())) / new_xmap.grid_asu().nu()
-    large_b = ( new_xmap.cell().b() * ( max_extent + new_xmap.grid_asu().nv())) / new_xmap.grid_asu().nv()
-    large_c = ( new_xmap.cell().c() * ( max_extent + new_xmap.grid_asu().nw())) / new_xmap.grid_asu().nw()
+    large_a = ( xmap.cell().a() * ( max_extent + xmap.grid_asu().nu())) / xmap.grid_asu().nu()
+    large_b = ( xmap.cell().b() * ( max_extent + xmap.grid_asu().nv())) / xmap.grid_asu().nv()
+    large_c = ( xmap.cell().c() * ( max_extent + xmap.grid_asu().nw())) / xmap.grid_asu().nw()
 
     cell_desc = clipper.Cell_descr ( large_a, large_b, large_c, \
-                  new_xmap.cell().alpha(), new_xmap.cell().beta(), new_xmap.cell().gamma() )
+                  xmap.cell().alpha(), xmap.cell().beta(), xmap.cell().gamma() )
 
     large_p1_cell = clipper.Cell ( cell_desc )
-    large_grid_sampling = clipper.Grid_sampling ( max_extent + new_xmap.grid_asu().nu(),
-                                                  max_extent + new_xmap.grid_asu().nv(),
-                                                  max_extent + new_xmap.grid_asu().nw() )
+    large_grid_sampling = clipper.Grid_sampling ( max_extent + xmap.grid_asu().nu(),
+                                                  max_extent + xmap.grid_asu().nv(),
+                                                  max_extent + xmap.grid_asu().nw() )
 
     large_xmap = clipper.Xmap_double ( sg, large_p1_cell, large_grid_sampling )
 
@@ -188,23 +174,47 @@ def prepare_map ( mapin = "",
     log_string += "\n  >> new cell parameters: %s" % large_p1_cell.format()
     callback( log_string, xml_root )
 
-
-    map_numpy = numpy.zeros( (large_xmap.grid_asu().nu(),
-                              large_xmap.grid_asu().nv(),
-                              large_xmap.grid_asu().nw()), dtype='double' )
-
-
-    new_xmap.export_numpy ( map_numpy )
-    log_string += "\n  >> map mean after resizing: %.4f" % numpy.mean(map_numpy)
     large_xmap.import_numpy ( map_numpy )
 
     # dump map to disk
     map_file = clipper.CCP4MAPfile()
-    map_file.open_write ( "mapout_zero_large.mrc" )
+    map_file.open_write ( "mapout_padded.mrc" )
     map_file.export_xmap_double ( large_xmap )
     map_file.close_write()
-    log_string += "\n  >> map file written to disk"
+    log_string += "\n  >> map file mapout_padded.mrc written to disk"
     callback( log_string, xml_root )
+
+    # import it back to nxmap so we can trivially shift the origin
+    map_file.open_read ( "mapout_padded.mrc" )
+    map_file.import_nxmap_double ( nxmap )
+    map_file.close_read()
+    log_string += "\n  >> file mapout_padded.mrc has been read back as nxmap"
+    callback( log_string, xml_root )
+
+    # now shift the origin
+    rtop_zero = clipper.RTop_double ( nxmap.operator_orth_grid().rot(), origin_trans )
+
+    log_string += "\n  >> moving origin..."
+    log_string += "\n     original translation: %s  new origin: %s" % ( nxmap.operator_orth_grid().trn(), rtop_zero.trn() )
+    callback( log_string, xml_root )
+
+    nxmap_zero = clipper.NXmap_double(nxmap.grid(), rtop_zero )
+    nxmap_zero.import_numpy ( map_numpy )
+
+    # dump map to disk
+    map_file.open_write ( "mapout_padded_zero.mrc" )
+    map_file.export_nxmap_double ( nxmap_zero )
+    map_file.close_write()
+    log_string += "\n  >> map file mapout_padded_zero.mrc written to disk"
+    callback( log_string, xml_root )
+
+    # read it back to an xmap so we can fft-it
+    new_xmap = clipper.Xmap_double ()
+    map_file.open_read ( "mapout_padded_zero.mrc" )
+    map_file.import_xmap_double ( new_xmap )
+    map_file.close_read()
+    log_string += "\n  >> map file mapout_padded_zero.mrc read back as xmap"
+    callback ( log_string, xml_root )
 
     # create HKL_info using user-supplied resolution parameter
     hkl_info = clipper.HKL_info (sg, large_p1_cell, resolution, True )
@@ -214,19 +224,18 @@ def prepare_map ( mapin = "",
     log_string += "\n  >> now computing map coefficients to %0.1f A resolution..." % resol
     callback( log_string, xml_root )
     
-    large_xmap.fft_to ( f_phi )
-    log_string += "\n  >> writing coefficients to MTZ file..."
+    new_xmap.fft_to ( f_phi )
+    log_string += "\n  >> writing map coefficients to MTZ file mapout_padded_zero.mtz"
     callback( log_string, xml_root )
 
     # setup an MTZ file so we can export our map coefficients
     mtzout  = clipper.CCP4MTZfile()
-    mtzout.open_write ( "mapout_zero_padded.mtz" )
+    mtzout.open_write ( "mapout_padded_zero.mtz" )
     mtzout.export_hkl_info ( f_phi.hkl_info() )
     mtzout.export_hkl_data ( f_phi, "*/*/[F, PHI]" )
     mtzout.close_write()
     log_string += "\n  >> all done"
     callback( log_string, xml_root )
-
 
     return log_string,xml_root,f_phi
 

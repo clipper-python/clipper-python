@@ -167,6 +167,8 @@ namespace std {
     #include "../clipper/contrib/originmatch.h"
     #include "../clipper/contrib/sfscale.h"
     #include "../clipper/core/rotation.h"
+    #include "../clipper/clipper-phs.h"
+    #include "../clipper/phs/phs_io.h"
 
     namespace clipper 
     {
@@ -2713,6 +2715,8 @@ namespace clipper {
 
 %include "../clipper/core/atomsf.h"
 %include "../clipper/core/rotation.h"
+%include "../clipper/clipper-phs.h"
+%include "../clipper/phs/phs_io.h"
 
 
 

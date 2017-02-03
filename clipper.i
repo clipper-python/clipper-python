@@ -2386,6 +2386,18 @@ void PopulateMatchesF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF
   }
 }
 
+void PopulateMatchesI_sigI_float(const clipper::HKL_data<clipper::data32::I_sigI> &d_ref, const clipper::HKL_data<clipper::data32::I_sigI> &d, std::vector<clipper::HKL> &matched){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if(d_ref[ih].I()  == d[ih.hkl()].I()  )
+       matched.push_back(ih.hkl());
+    else if (  d_ref[ih].missing()  && d[ih.hkl()].missing()  )
+         matched.push_back(ih.hkl());
+    else
+      std::cout << ih.hkl().format() << " no match " << clipper::String(  d_ref[ih].I() ) << " " <<  clipper::String( d[ih.hkl()].I() ) << "\n";
+  }
+}
+
 void PopulateMatchesE_sigE_float(const clipper::HKL_data<clipper::data32::E_sigE> &d_ref, const clipper::HKL_data<clipper::data32::E_sigE> &d, std::vector<clipper::HKL> &matched){
   typedef clipper::HKL_data_base::HKL_reference_index HRI;
   for ( HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
@@ -2513,6 +2525,22 @@ void SetData(const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F1, c
     }
   }
 }
+
+////////////// Same but with I,SIGI
+
+template <typename T> void CopyIfI_sigIRefNotMissing_float(const T &d_in, T &d_out,  const clipper::HKL_data<clipper::data32::I_sigI> &d_ref){
+  typedef clipper::HKL_data_base::HKL_reference_index HRI;
+  for (HRI ih = d_ref.first(); !ih.last(); ih.next() ) {
+    if (!d_ref[ih].missing()) {
+      d_out[ih] = d_in[ih.hkl()];
+    } else {
+      d_out[ih].set_null();
+    }
+  }
+}
+
+
+
 %}
 void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_sigF> &d_in, clipper::HKL_data<clipper::data32::F_sigF> &d_out,  const clipper::HKL_info &newhkl);
 void CopyOverHKLInfo(const clipper::HKL_data<clipper::data32::F_sigF_ano> &d_in, clipper::HKL_data<clipper::data32::F_sigF_ano> &d_out,  const clipper::HKL_info &newhkl);
@@ -2530,6 +2558,7 @@ void CopyIfF_sigFRefNotMissingF_phi_float(const clipper::HKL_data<clipper::data3
 void CopyIfF_sigFRefNotMissingFlag_float(const clipper::HKL_data<clipper::data32::Flag> &d_in, clipper::HKL_data<clipper::data32::Flag> &d_out,  const clipper::HKL_data<clipper::data32::F_sigF> &d_ref);
 
 void PopulateMatchesF_sigF_float(const clipper::HKL_data<clipper::data32::F_sigF> &d_ref, const clipper::HKL_data<clipper::data32::F_sigF> &d, std::vector<clipper::HKL> &matched);
+void PopulateMatchesI_sigI_float(const clipper::HKL_data<clipper::data32::I_sigI> &d_ref, const clipper::HKL_data<clipper::data32::I_sigI> &d, std::vector<clipper::HKL> &matched);
 void PopulateMatchesE_sigE_float(const clipper::HKL_data<clipper::data32::E_sigE> &d_ref, const clipper::HKL_data<clipper::data32::E_sigE> &d, std::vector<clipper::HKL> &matched);
 void PopulateMatchesABCD_float(const clipper::HKL_data<clipper::data32::ABCD> &d_ref, const clipper::HKL_data<clipper::data32::ABCD> &d, std::vector<clipper::HKL> &matched);
 void PopulateMatchesPhi_fom_float(const clipper::HKL_data<clipper::data32::Phi_fom> &d_ref, const clipper::HKL_data<clipper::data32::Phi_fom> &d, std::vector<clipper::HKL> &matched);
@@ -2538,6 +2567,11 @@ void PopulateMatchesFlag_float(const clipper::HKL_data<clipper::data32::Flag> &d
 void SetFlagBoth(clipper::HKL_data<clipper::data32::Flag> &flag);
 void SetFlagBothIfMissing(clipper::HKL_data<clipper::data32::Flag> &flag, const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &myfsigf, const clipper::HKL_data< clipper::datatypes::Flag > &status, int freeflag);
 void SetData(const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F1, const clipper::HKL_data< clipper::datatypes::F_sigF<float> > &F2, const clipper::String &CHECK, const clipper::String &OPS, const clipper::String &ELSE_OPS);
+
+//////////////// Same with I,SIGI
+
+void CopyIfI_sigIRefNotMissing_float(const clipper::HKL_data<clipper::data32::I_sigI> &d_in, clipper::HKL_data<clipper::data32::I_sigI> &d_out,  const clipper::HKL_data<clipper::data32::I_sigI> &d_ref);
+
 
 %include "../clipper/contrib/edcalc.h"
 namespace clipper {

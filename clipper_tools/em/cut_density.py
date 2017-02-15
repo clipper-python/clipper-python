@@ -12,11 +12,11 @@ from lxml import etree
 
 def cut_by_model ( mapin = "",
                    pdbin = "",
-                   ipradius = 2.5,
-                   ipresol  = 1.0,
+                   ipradius = 1.5,
+                   ipresol  = 8.0,
                    callback = callbacks.interactive_flush ) :
 
-    nxmap = clipper.NXmap_double( )
+    #nxmap = clipper.NXmap_double( )
     xmap  = clipper.Xmap_double ( )
     map_file = clipper.CCP4MAPfile( )
     sg = clipper.Spacegroup.p1()
@@ -37,13 +37,6 @@ def cut_by_model ( mapin = "",
     if mapin == "" or pdbin == "" :
         return log_string,xml_root,None
 
-    # read the cryoEM map into nxmap, get map data irrespective of origin
-    map_file.open_read ( mapin )
-    map_file.import_nxmap_double ( nxmap )
-    map_file.close_read()
-    log_string += "\n  >> file %s has been read as nxmap" % mapin
-    callback( log_string, xml_root )
-
     # read pdb, kick coordinates, write pdb
     from clipper_tools.io.molecules import read_pdb
     log_string_sub,xml_root,mmol = read_pdb ( pdbin )
@@ -58,18 +51,18 @@ def cut_by_model ( mapin = "",
     callback( log_string, xml_root )
     
     grid_sampling = clipper.Grid_sampling ( xmap.grid_asu().nu(),
-                                                  xmap.grid_asu().nv(),
-                                                  xmap.grid_asu().nw() )
+                                            xmap.grid_asu().nv(),
+                                            xmap.grid_asu().nw() )
 
     log_string += "\n  >> cell parameters: %s" % xmap.cell().format()
-    log_string += "\n     original translation: %s" % nxmap.operator_orth_grid().trn()
     callback( log_string, xml_root )
 
     # put map content in a numpy data structure
     import numpy
-    map_numpy = numpy.zeros( (nxmap.grid().nu(), nxmap.grid().nv(), nxmap.grid().nw()), dtype='double')
+    map_numpy = numpy.zeros( (xmap.grid_asu().nu(), xmap.grid_asu().nv(), xmap.grid_asu().nw()), dtype='double')
     log_string += "\n  >> exporting a numpy array of %i x %i x %i grid points" \
-               % (nxmap.grid().nu(), nxmap.grid().nv(), nxmap.grid().nw())
+               % (xmap.grid_asu().nu(), xmap.grid_asu().nv(), xmap.grid_asu().nw())
+    data_points = xmap.export_numpy ( map_numpy )
     callback( log_string, xml_root  )
 
     atom_list = mmol.model().atom_list()
@@ -79,12 +72,29 @@ def cut_by_model ( mapin = "",
     masker = clipper.EDcalc_mask_float ( ipradius )
     masker.compute ( mask, atom_list )
 
+    mask_matrix = numpy.zeros( (xmap.grid_asu().nu(), xmap.grid_asu().nv(), xmap.grid_asu().nw()), dtype='double')
+    mask_points = mask.export_numpy ( mask_matrix )
+
+    log_string += "\n  >> the original map has %i points and the computed mask has %i points" % (data_points, mask_points)
+    callback ( log_string, xml_root )
+
+    print sum(sum( mask_matrix == 0.0 ))
+
+    masked_array = map_numpy * mask_matrix
+
+    log_string += "\n  >> non-zero values: original= %i ; mask=%i ; product=%i" % (numpy.count_nonzero(map_numpy), numpy.count_nonzero(mask_matrix), numpy.count_nonzero(masked_array))
+
+    xmap.import_numpy ( masked_array )
+
+    # create HKL_info using user-supplied resolution parameter
+    hkl_info = clipper.HKL_info (xmap.spacegroup(), xmap.cell(), resolution, True )
+
     # fft the map
     f_phi = clipper.HKL_data_F_phi_float( hkl_info, xmap.cell() )
-    log_string += "\n  >> now computing map coefficients to %0.1f A resolution..." % resol
+    log_string += "\n  >> now computing map coefficients to %0.1f A resolution..." % ipresol
     callback( log_string, xml_root )
     
-    new_xmap.fft_to ( f_phi )
+    xmap.fft_to ( f_phi )
     log_string += "\n  >> writing map coefficients to MTZ file mapout_cut_density.mtz"
     callback( log_string, xml_root )
 

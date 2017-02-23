@@ -8,11 +8,12 @@ from lxml import etree
 
 def read_pdb ( pdbin = "undefined" ) :
 
-    log_string = "\n  >> clipper_tools: read_pdb"
+    log_string = "\n  >> clipper_tools: io.molecules.read_pdb"
     log_string += "\n     pdbin: %s" % pdbin
 
-    xml_root = etree.Element('read_pdb')
-    xml_root.attrib['pdbin'] = pdbin
+    xml_root = etree.Element('input_file')
+    xml_root.attrib['name'] = pdbin
+    xml_root.attrib['type'] = 'PDB'
     
     if pdbin is not "undefined" :
 
@@ -40,11 +41,12 @@ def read_pdb ( pdbin = "undefined" ) :
 
 def write_pdb ( pdbout = "xyzout.pdb", molout = None ) :
 
-    log_string = "\n  >> clipper_tools: write_pdb"
+    log_string = "\n  >> clipper_tools: io.molecules.write_pdb"
     log_string += "\n     pdbout: %s" % pdbout
 
-    xml_root = etree.Element('write_pdb')
-    xml_root.attrib['pdbout'] = pdbout
+    xml_root = etree.Element('output_file')
+    xml_root.attrib['name'] = pdbout
+    xml_root.attrib['type'] = 'PDB'
     
     if molout is None :
         xml_root.attrib['ok']    = 'no'

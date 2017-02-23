@@ -8,7 +8,7 @@ from lxml import etree
 #  @param bulk_solvent boolean parameter, set True for turning bulk solvent correction on
 #  @return a plain text log string, an XML etree and a clipper.HKL_data_F_phi_float object
 
-def structure_factors ( fsigf=None, hklinfo=None, mmol=None, bulk_solvent=True ) :
+def calculate_structure_factors ( fsigf=None, hklinfo=None, mmol=None, bulk_solvent=True ) :
 
     log_string = "\n  >> clipper_tools: structure_factors"
     log_string += "\n     bulk_solvent: %s" % bulk_solvent

@@ -90,8 +90,8 @@ def prepare_map ( mapin = "",
 
     # create log string so console-based apps get some feedback
     log_string = "\n  >> clipper_tools: mr_from_em.structure_factors"
-    log_string += "\n            mapin: %s" % mapin
-    log_string += "\n            resol: %s" % resol
+    log_string += "\n    mapin: %s" % mapin
+    log_string += "\n    resol: %s" % resol
 
     # create XML tree, to be merged in a global structured results file
     xml_root = etree.Element('structure_factors')

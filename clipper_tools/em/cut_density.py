@@ -14,40 +14,50 @@ def cut_by_model ( mapin = "",
                    pdbin = "",
                    ipradius = 1.5,
                    ipresol  = 8.0,
+                   ipbfact  = 0.0,
                    callback = callbacks.interactive_flush ) :
 
     #nxmap = clipper.NXmap_double( )
     xmap  = clipper.Xmap_double ( )
-    map_file = clipper.CCP4MAPfile( )
     sg = clipper.Spacegroup.p1()
     resolution = clipper.Resolution ( ipresol )
 
     # create log string so console-based apps get some feedback
-    log_string = "\n  >> clipper_tools: em.cut_density.cut_from_model"
-    log_string += "\n            mapin: %s" % mapin
-    log_string += "\n            resol: %s" % ipresol
+    log_string = "\n  >> clipper_tools: em.cut_density.cut_by_model"
+    log_string += "\n    mapin: %s" % mapin
+    log_string += "\n    pdbin: %s" % pdbin
+    log_string += "\n    bfact: %s" % ipbfact
+    log_string += "\n    resol: %s" % ipresol
+    log_string += "\n    radius: %s" % ipradius
 
     # create XML tree, to be merged in a global structured results file
-    xml_root = etree.Element('cut_by_model')
+    xml_root = etree.Element('program')
+    xml_root.attrib['name']  = 'cut_by_model'
     xml_root.attrib['mapin'] = mapin
     xml_root.attrib['pdbin'] = pdbin
+    xml_root.attrib['b_factor'] = str(ipbfact)
+    xml_root.attrib['resolution'] = str(ipresol)
+    xml_root.attrib['mask_radius'] = str(ipradius)
     callback( log_string, xml_root  )
 
     # nothing in, nothing out
     if mapin == "" or pdbin == "" :
         return log_string,xml_root,None
 
-    # read pdb, kick coordinates, write pdb
+    # read the input atomic model
     from clipper_tools.io.molecules import read_pdb
-    log_string_sub,xml_root,mmol = read_pdb ( pdbin )
+    log_string_sub,xml_sub,mmol = read_pdb ( pdbin )
     log_string += log_string_sub
+    xml_root.append ( xml_sub )
+    
     callback( log_string, xml_root )
 
     # read the cryoEM map into xmap to get cell dimensions, etc.
-    map_file.open_read ( mapin )
-    map_file.import_xmap_double ( xmap )
-    map_file.close_read()
-    log_string += "\n  >> file %s has been read as xmap" % mapin
+    from clipper_tools.io.maps import read_xmap
+    log_sub, xml_sub, xmap = read_xmap ( mapin )
+
+    log_string += log_sub
+    xml_root.append ( xml_sub )
     callback( log_string, xml_root )
     
     grid_sampling = clipper.Grid_sampling ( xmap.grid_asu().nu(),
@@ -78,8 +88,6 @@ def cut_by_model ( mapin = "",
     log_string += "\n  >> the original map has %i points and the computed mask has %i points" % (data_points, mask_points)
     callback ( log_string, xml_root )
 
-    print sum(sum( mask_matrix == 0.0 ))
-
     masked_array = map_numpy * mask_matrix
 
     log_string += "\n  >> non-zero values: original= %i ; mask=%i ; product=%i" % (numpy.count_nonzero(map_numpy), numpy.count_nonzero(mask_matrix), numpy.count_nonzero(masked_array))
@@ -98,20 +106,33 @@ def cut_by_model ( mapin = "",
     log_string += "\n  >> writing map coefficients to MTZ file mapout_cut_density.mtz"
     callback( log_string, xml_root )
 
+    if ipbfact != 0.0 :
+        f_phi.compute_scale_u_iso_fphi ( 1.0, clipper.Util.b2u(-ipbfact), f_phi )
+        log_string += "\n  >> and applying B factor correction - using %3.2f\n" % ipbfact
+
     # setup an MTZ file so we can export our map coefficients
-    mtzout  = clipper.CCP4MTZfile()
-    mtzout.open_write ( "mapout_cut_density.mtz" )
-    mtzout.export_hkl_info ( f_phi.hkl_info() )
-    mtzout.export_hkl_data ( f_phi, "*/*/[F, PHI]" )
-    mtzout.close_write()
+    from clipper_tools.io.map_coefficients import write_to_mtz
+    log_sub,xml_sub = write_to_mtz ( f_phi, "mapout_cut_density.mtz" )
+
+    log_string += log_sub
+    xml_root.append ( xml_sub )
+
     log_string += "\n  >> all done"
     callback( log_string, xml_root )
 
+    from clipper_tools.callbacks import offline_flush
+    offline_flush ( log_string, xml_root )
 
 if __name__ == '__main__':
     import sys
-    cut_by_model ( sys.argv[1], sys.argv[2] )
-
+    print sys.argv
+    if len(sys.argv) == 6 :
+        cut_by_model ( sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]) )
+    elif len(sys.argv) == 3 :
+        cut_by_model ( sys.argv[1], sys.argv[2] )
+    else :
+        print "\n  >> clipper_tools: em.cut_density.cut_by_model"
+        print "\n  >>    Parameters: mapin pdbin [radius] [resol] [bfact]\n\n"
 
 
 

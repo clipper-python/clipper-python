@@ -5,6 +5,8 @@
 #
 #  Package containing functions for cutting density out of cryoEM maps
 
+import time
+import getpass
 import clipper
 from clipper_tools import callbacks
 from lxml import etree
@@ -17,7 +19,6 @@ def cut_by_model ( mapin = "",
                    ipbfact  = 0.0,
                    callback = callbacks.interactive_flush ) :
 
-    #nxmap = clipper.NXmap_double( )
     xmap  = clipper.Xmap_double ( )
     sg = clipper.Spacegroup.p1()
     resolution = clipper.Resolution ( ipresol )
@@ -33,11 +34,15 @@ def cut_by_model ( mapin = "",
     # create XML tree, to be merged in a global structured results file
     xml_root = etree.Element('program')
     xml_root.attrib['name']  = 'cut_by_model'
-    xml_root.attrib['mapin'] = mapin
-    xml_root.attrib['pdbin'] = pdbin
-    xml_root.attrib['b_factor'] = str(ipbfact)
-    xml_root.attrib['resolution'] = str(ipresol)
-    xml_root.attrib['mask_radius'] = str(ipradius)
+    xml_root.attrib['user']  = getpass.getuser()
+    xml_root.attrib['date']  = time.strftime("%c")
+    
+    params = etree.SubElement ( xml_root, 'parameters' )
+    params.attrib['mapin'] = mapin
+    params.attrib['pdbin'] = pdbin
+    params.attrib['b_factor'] = str(ipbfact)
+    params.attrib['resolution'] = str(ipresol)
+    params.attrib['mask_radius'] = str(ipradius)
     callback( log_string, xml_root  )
 
     # nothing in, nothing out
@@ -118,6 +123,7 @@ def cut_by_model ( mapin = "",
     xml_root.append ( xml_sub )
 
     log_string += "\n  >> all done"
+    xml_root.attrib['ok'] = 'yes'
     callback( log_string, xml_root )
 
     from clipper_tools.callbacks import offline_flush

@@ -8,25 +8,35 @@
 
 import clipper
 from clipper_tools import callbacks
+from phaser import *
+from iotbx import mtz
 from lxml import etree
 
-## Reads EM map, sets origin to 0, pads cell and computes finely-sampled structure factors
-#  @param mapin string path to a map that will be read into a clipper.NXmap_float object
-#  @param resol estimated resolution (float)
-#  @param callback a function that takes care of log string and xml flushing
-#  @return a plain text log string, an XML etree and a clipper.HKL_data_F_phi_float object
 
 def prepare_map ( mapin = "",
                   resol = 8.0,
                   callback = callbacks.interactive_flush ) :
+    """Reads EM map, sets origin to 0, pads cell and computes finely-sampled structure factors
+    
+       Parameters:
+         mapin -- a string path to a map that will be read into a clipper.NXmap_float object
+         resol -- estimated resolution (float)
+         callback -- a function that takes care of log string and xml flushing
+       
+       Returns:
+         a plain text log string, an XML etree and a clipper.HKL_data_F_phi_float object"""
 
-    ## Reads numpy array, determines the extent of the electron density
-    #  @param numpy_in a numpy array containing grid points
-    #  @param tolerance number of points in a plane with value greater than 1 sigma
-    #  @return a vector of grid indices: (min_u, max_u, min_v, max_v, min_w, max_w)
 
     def determine_extent (  numpy_in, tolerance ) :
-    
+        """Reads numpy array, determines the extent of the electron density
+        
+        Parameters:
+          numpy_in -- a numpy array containing grid points
+          tolerance -- number of points in a plane with value greater than 1 sigma
+        
+        Returns:
+          a vector of grid indices: (min_u, max_u, min_v, max_v, min_w, max_w)"""
+
         log_string = ""
         min = clipper.Coord_orth()
         max = clipper.Coord_orth()
@@ -86,10 +96,11 @@ def prepare_map ( mapin = "",
     
         ################# end determine_extent ################
 
+
     ############### main function ################
 
     # create log string so console-based apps get some feedback
-    log_string = "\n  >> clipper_tools: mr_from_em.structure_factors"
+    log_string = "\n  >> clipper_tools: mr_from_em.prepare_map"
     log_string += "\n    mapin: %s" % mapin
     log_string += "\n    resol: %s" % resol
 
@@ -98,7 +109,8 @@ def prepare_map ( mapin = "",
     xml_root.attrib['mapin'] = mapin
     xml_root.attrib['resol'] = str ( resol )
     callback( log_string, xml_root  )
-
+    
+    phaser_params = {}
     nxmap = clipper.NXmap_double( )
     xmap  = clipper.Xmap_double ( )
     map_file = clipper.CCP4MAPfile( )
@@ -237,5 +249,33 @@ def prepare_map ( mapin = "",
     log_string += "\n  >> all done"
     callback( log_string, xml_root )
 
-    return log_string,xml_root,f_phi
+    return log_string,xml_root,f_phi,phaser_params
 
+
+def run_phaser ( phaser_params={}, callback=callbacks.interactive_flush ) :
+    """ Runs Phaser with diffraction data and a set of pre-prepared map coefficients
+
+        Parameters:
+          phaser_params -- a dictionary with keywords for Phaser
+          callback -- a function that takes care of log string and xml flushing
+        
+        Returns:
+          a plain text log string and an XML etree containing placed solutions
+    """
+    
+    # create log string so console-based apps get some feedback
+    log_string = "\n  >> clipper_tools: mr_from_em.run_phaser"
+    log_string += "\n    phaser_params: \n%s" % phaser_params
+
+    # create XML tree, to be merged in a global structured results file
+    xml_root = etree.Element('run_phaser')
+    xml_root.attrib['phaser_params'] = phaser_params
+    callback( log_string, xml_root  )
+    
+    if phaser_params is {} :
+        log_string = "\n  >> No parameters provided. Phaser will not run."
+        return log_string, xml_root
+
+
+
+    return log_string, xml_root

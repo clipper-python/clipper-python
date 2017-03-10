@@ -170,6 +170,10 @@ namespace std {
     #include "../clipper/clipper-phs.h"
     #include "../clipper/phs/phs_io.h"
 
+    #ifndef NPY_ARRAY_F_CONTIGUOUS
+        #define NPY_ARRAY_F_CONTIGUOUS NPY_F_CONTIGUOUS
+    #endif
+
     namespace clipper 
     {
         static int myErr = 0; // flag to save error state

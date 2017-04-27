@@ -63,8 +63,8 @@ include_directories(${CCP4_INCLUDE_DIRS}
                     ${PYTHON_NUMPY_INCLUDE_PATH}
                     "${PYTHON_INCLUDE_DIR}")
 
-SET_SOURCE_FILES_PROPERTIES(clipper.i PROPERTIES CPLUSPLUS ON)
-SWIG_ADD_MODULE(clipper python clipper.i )
+SET_SOURCE_FILES_PROPERTIES(src/clipper.i PROPERTIES CPLUSPLUS ON)
+SWIG_ADD_MODULE(clipper python src/clipper.i )
 
 IF(WIN32)
     SET(SWIG_CLIPPER_MODULE_SUFFIX "pyd")

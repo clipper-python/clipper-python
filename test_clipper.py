@@ -15,24 +15,25 @@ sg,samp,cell =  f.spacegroup(),f.grid_sampling(), f.cell()
 print sg.symbol_laue()
 print sg.symbol_hall()
 print cell
-print cell.a(),cell.b(),cell.c(),cell.alpha(),cell.beta(),cell.gamma()
+print cell.dim, cell.angles
 
 print samp.nu(),samp.nv(),samp.nw()
 
 at = clipper.Atom()
-at.set_element("H")
+at.element = clipper.String("H")
 # Do not know why this is necessary.
-print clipper.ClipperStringAsString(at.element())
+print at.element
+print type(at.element)
 
 stats = clipper.Map_stats(xmap)
 print stats.mean(), stats.min(),stats.max(),stats.std_dev()
 
 # Range is unwrapped memory leak, but Range<double> and Range<float> are OK, but require specialized methods.
 # There may be a better way, but this works!
-print stats.range_double().max()
-print stats.range_double().min()
-print stats.range_double().contains(0)
-print stats.range_double().contains(100)
+print stats.range().max()
+print stats.range().min()
+print 0 in stats.range()
+print 100 in stats.range()
 
 c1 = clipper.Coord_orth(1,2,3)
 c2 = clipper.Coord_orth(10,10,10)
@@ -40,8 +41,8 @@ c2 = clipper.Coord_orth(10,10,10)
 c = c1+c2
 cm = -c
 
-print c.x(), c.y(), c.z()
-print cm.x(), cm.y(), cm.z()
+print c.xyz
+print cm.xyz
 
 cif = clipper.CIFfile()
 mydata = clipper.HKL_info()
@@ -56,11 +57,11 @@ if len(sys.argv)>2:
   cif.open_read (sys.argv[2])
   cif.import_hkl_info(mydata)
   print dir(mydata)
-  sg,cell =  mydata.spacegroup(), mydata.cell()
+  sg,cell =  mydata.spacegroup, mydata.cell
   print sg.symbol_laue()
   print sg.symbol_hall()
   print cell
-  print cell.a(),cell.b(),cell.c(),cell.alpha(),cell.beta(),cell.gamma()
+  print cell.dim, cell.angles
   myfsigf = clipper.HKL_data_F_sigF_float(mydata)
   status = clipper.HKL_data_Flag(mydata)
   cif.import_hkl_data(myfsigf)
@@ -78,7 +79,7 @@ if len(sys.argv)>2:
   print  mydata.num_reflections()
   cxtl = clipper.MTZcrystal()
   fm = clipper.MMDBfile()
-  fm.read_file(sys.argv[3])
+  fm.read_file(clipper.String(sys.argv[3]))
   mmol = clipper.MiniMol ()
   fm.import_minimol ( mmol )
   atoms = mmol.atom_list()
@@ -123,10 +124,10 @@ if len(sys.argv)>2:
 
   xmap2 = clipper.Xmap_float()
   rate = 1.33333
-  gs = clipper.Grid_sampling(mydata.spacegroup(), mydata.cell(), mydata.resolution(), rate)
-  xmap2.init(mydata.spacegroup(), mydata.cell(), gs);
+  gs = clipper.Grid_sampling(mydata.spacegroup, mydata.cell, mydata.resolution, rate)
+  xmap2.init(mydata.spacegroup, mydata.cell, gs);
   print dir(xmap2)
-  xmap2.fft_from_float( fb );
+  xmap2.fft_from( fb );
   stats2 = clipper.Map_stats(xmap2)
   print stats2.mean(), stats2.min(),stats2.max(),stats2.std_dev()
   if len(sys.argv)>4:
@@ -141,7 +142,7 @@ if len(sys.argv)>2:
   invert = om(shift,fb,fd)
   print invert
 
-  print shift.u(), shift.v(), shift.w()
+  print shift.uvw
 
 
 

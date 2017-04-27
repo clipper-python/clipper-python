@@ -17,13 +17,22 @@ print sg.symbol_hall()
 print cell
 print cell.dim, cell.angles
 
+print cell.format()
+print type(cell.format())
+
 print samp.nu(),samp.nv(),samp.nw()
 
 at = clipper.Atom()
-at.element = clipper.String("H")
 # Do not know why this is necessary.
+#at.element = clipper.String("H")
+foo = clipper.String("foo")
+at.element = "H"
 print at.element
+print dir(at.element)
 print type(at.element)
+print type(foo)
+
+at.element = at.element
 
 stats = clipper.Map_stats(xmap)
 print stats.mean(), stats.min(),stats.max(),stats.std_dev()
@@ -79,7 +88,7 @@ if len(sys.argv)>2:
   print  mydata.num_reflections()
   cxtl = clipper.MTZcrystal()
   fm = clipper.MMDBfile()
-  fm.read_file(clipper.String(sys.argv[3]))
+  fm.read_file(sys.argv[3])
   mmol = clipper.MiniMol ()
   fm.import_minimol ( mmol )
   atoms = mmol.atom_list()

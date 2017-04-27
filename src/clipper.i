@@ -142,8 +142,54 @@ def safesplat_float(func):
 
 
 
-%apply std::string { clipper::String }
-%apply std::string& { clipper::String& }
+//%apply std::string { clipper::String }
+//%apply std::string& { clipper::String& }
+
+/* FIXME - flaky!!! */
+%typemap(in) clipper::String& {
+  clipper::String foo = clipper::String(PyString_AsString($input));
+  $1 = &foo;
+} 
+
+%typemap(in) const clipper::String& {
+  clipper::String foo = clipper::String(PyString_AsString($input));
+  $1 = &foo;
+} 
+
+%typemap(in) clipper::String {
+  $1 = clipper::String(PyString_AsString($input));
+} 
+
+/* FIXME - and these don't work in all cases. */
+%typemap(out) clipper::String {
+  const char *foo = $1.c_str();
+  $result = PyString_FromString(foo);
+} 
+
+%typemap(out) const clipper::String& {
+  const char *foo = $1->c_str();
+  $result = PyString_FromString(foo);
+} 
+
+%typemap(out) clipper::String& {
+  const char *foo = $1->c_str();
+  $result = PyString_FromString(foo);
+} 
+
+%typemap(out) String {
+  const char *foo = $1.c_str();
+  $result = PyString_FromString(foo);
+} 
+%typemap(out) const String& {
+  const char *foo = $1->c_str();
+  $result = PyString_FromString(foo);
+} 
+
+%typemap(out) String& {
+  const char *foo = $1->c_str();
+  $result = PyString_FromString(foo);
+} 
+
 
 
 //%apply std::string { String }

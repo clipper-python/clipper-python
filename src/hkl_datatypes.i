@@ -1,5 +1,6 @@
 
-
+%ignore operator std::complex<float>;
+%ignore operator std::complex<double>;
 %include "../clipper/core/hkl_datatypes.h"
 
 namespace clipper
@@ -122,6 +123,10 @@ COPY_DATATYPE_HELPER(F_phi)
 COPY_DATATYPE_HELPER(ABCD)
 
   %extend datatypes::F_phi{
+
+    std::complex<dtype> as_complex() {
+      return std::complex<dtype>(*self);
+    }
     clipper::datatypes::F_phi<dtype>  __add__(const clipper::datatypes::F_phi<dtype> &h2)
     {
       return *self+h2;

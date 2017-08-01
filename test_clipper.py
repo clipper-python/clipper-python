@@ -97,16 +97,9 @@ if len(sys.argv)>2:
   print(len(myfsigf.getData()))
   fsigf_numpy = myfsigf.as_numpy()
   myfsigf.as_numpy(fsigf_numpy)
-  fsigf_numpy_new = myfsigf.as_numpy(func = 'new')
-  for i in range(len(fsigf_numpy)):
-      if not numpy.isnan(fsigf_numpy[i][0]):
-          print fsigf_numpy[i]
-          print fsigf_numpy_new[i]
-          print i
-          break
-  assert numpy.allclose(fsigf_numpy, fsigf_numpy_new, equal_nan = True)
   print(len(fsigf_numpy))
 
+  print myfsigf[0].as_complex()
   print fsigf_numpy[0]
   print fsigf_numpy[-1]
 

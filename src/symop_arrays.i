@@ -49,9 +49,9 @@
     return true;
   }
 
-  template <class T = Coord_frac> T cell_shift (const T& coord)
+  Coord_frac cell_shift (const Coord_frac& coord)
   {
-    T ret;
+    Coord_frac ret;
     for (size_t i = 0; i < 3; i++) {
       ret[i] = floor(coord[i]);
     }
@@ -111,7 +111,7 @@
         for (std::vector<clipper::Symop >::iterator it = ops.begin();
         it != ops.end(); ++it) {
           symops_.push_back(RTop_frac(it->rot(), it->trn()));
-          unit_translations_.push_back(cell_shift<>(Coord_frac(it->trn())));
+          unit_translations_.push_back(cell_shift(Coord_frac(it->trn())));
           size_ += 1;
         }
       }
@@ -140,7 +140,7 @@
           throw std::out_of_range("");
         }
         symops_[i] = op;
-        unit_translations_[i] = cell_shift<>(Coord_frac(op.trn()));
+        unit_translations_[i] = cell_shift(Coord_frac(op.trn()));
       }
       size_t __len__()
       {
@@ -149,7 +149,7 @@
       void append(clipper::RTop_frac op)
       {
         symops_.push_back(op);
-        unit_translations_.push_back(cell_shift<>(Coord_frac(op.trn())));
+        unit_translations_.push_back(cell_shift(Coord_frac(op.trn())));
         size_ += 1;
       }
       clipper::RTop_frac pop(int i)

@@ -132,7 +132,7 @@ namespace clipper
     Xmap<T>::Map_reference_coord ref(*self, pos);
     return ref;
   }
-  
+
   // reimplemented from Xmap_base
   const Grid_sampling& grid_sampling() const { return self->grid_sampling(); }
   const Cell& cell() const { return self->cell(); }
@@ -141,25 +141,25 @@ namespace clipper
   bool is_null() const { return self->is_null(); }
   // ~Xmap_base
 
-  std::vector<double> _recalculate_stats ()
+  std::vector<T> _recalculate_stats ()
   {
-    std::vector<double> ret;
-    double max, min, mean, sd, skew, kurtosis;
+    std::vector<T> ret;
+    T max, min, mean, sd, skew, kurtosis;
     int n = 0;
 
-    double sum = 0;
-    double sum_sq = 0;
-    double sum_3rd = 0;
-    double sum_4th = 0;
+    T sum = 0;
+    T sum_sq = 0;
+    T sum_3rd = 0;
+    T sum_4th = 0;
 
-    double rho_sq, rho_3rd, rho_4th;
+    T rho_sq, rho_3rd, rho_4th;
 
     Xmap_base::Map_reference_index ix;
     ix = self->first();
     max = min = (*self)[ix];
     for (ix = self->first(); !ix.last(); ix.next()) {
-      const double &rho = (*self)[ix];
-      if (! clipper::Util::is_nan(rho)) {
+      const T &rho = (*self)[ix];
+      if (! isnan(rho)) {
         n++;
         if (rho < min) min = rho;
         if (rho > max) max = rho;
@@ -176,10 +176,10 @@ namespace clipper
 
     if (n > 0) {
       mean = sum / n;
-      double variance = sum_sq / n - mean * mean;
+      T variance = sum_sq / n - mean * mean;
       sd = sqrt (variance);
       skew = sum_3rd / n - 3 * mean * variance - mean * mean * mean;
-      double kt = sum_4th
+      T kt = sum_4th
                   - 4 * sum_3rd * mean
                   + 6 * sum_sq  * mean * mean
                   - 4 * sum     * mean * mean * mean
@@ -643,9 +643,9 @@ namespace clipper
       return self.__stats
 
 #ifndef PYTHON_PROPERTIES
-    def max(self):
-      return self.stats()[0]
     def min(self):
+      return self.stats()[0]
+    def max(self):
       return self.stats()[1]
     def mean(self):
       return self.stats()[2]
@@ -657,10 +657,10 @@ namespace clipper
       return self.stats()[5]
 #else
     @property
-    def max(self):
+    def min(self):
       return self.stats[0]
     @property
-    def min(self):
+    def max(self):
       return self.stats[1]
     @property
     def mean(self):
@@ -725,19 +725,19 @@ namespace clipper
       return _target
 
 #ifdef PYTHON_PROPERTIES
-    
+
     _name = None
-    
+
     @property
     def name(self):
       return self._name
-    
+
     @name.setter
     def name(self, name):
       self._name = name
-    
+
     _is_difference_map = False
-    
+
     @property
     def is_difference_map(self):
       '''
@@ -745,11 +745,11 @@ namespace clipper
       and negative contours displayed, etc.).
       '''
       return self._is_difference_map
-    
+
     @is_difference_map.setter
     def is_difference_map(self, isdiff):
       self._is_difference_map = isdiff
-    
+
     grid = property(grid_sampling)
     grid_sampling = property(grid_sampling)
     cell = property(cell)
@@ -760,11 +760,11 @@ namespace clipper
     voxel_size_frac = property(voxel_size_frac)
     grid_asu = property(grid_asu)
     is_null = property(is_null)
-    
+
     @property
     def grid_samples(self):
       return self.grid.dim
-        
+
 #endif
 
   %} //pythoncode

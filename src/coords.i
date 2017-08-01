@@ -26,7 +26,7 @@ namespace clipper {
   %rename("_nu") Grid_sampling::nu() const;
   %rename("_nv") Grid_sampling::nv() const;
   %rename("_nw") Grid_sampling::nu() const;
-  %rename("_get_element") Atom::element() const;
+  %rename("_get_element_as_clipper_string") Atom::element() const;
   %rename("_set_element") Atom::set_element;
   %rename("_get_occupancy") Atom::occupancy() const;
   %rename("_set_occupancy") Atom::set_occupancy;
@@ -74,8 +74,8 @@ ATOM_NAMES = set(
       'U3+',  'U4+',  'U6+',  'Np3+', 'Np4+', 'Np6+', 'Pu3+',
       'Pu4+', 'Pu6+'])
 
-  
-  
+
+
 %}
 
 %include "../clipper/core/coords.h"
@@ -111,11 +111,11 @@ namespace clipper
     @safesplat_int
     def _new_coord_grid(u, v, w):
         return Coord_grid(u, v, w)
-    
+
     def __add__(self, other):
       '''
       This __add__ function should allow you to add any iterable of three
-      ints to your Coord_grid object, as long as your sum is written 
+      ints to your Coord_grid object, as long as your sum is written
             Coord_grid + other_iterable
       Note that the reverse:
             other_iterable + Coord_grid
@@ -182,11 +182,11 @@ namespace clipper
     @safesplat_float
     def _new_coord_orth(x, y, z):
         return Coord_orth(x, y, z)
-        
+
     def __add__(self, other):
       '''
       This __add__ function should allow you to add any iterable of three
-      numbers to your Coord_orth object, as long as your sum is written 
+      numbers to your Coord_orth object, as long as your sum is written
             Coord_orth + other_iterable
       Note that the reverse:
             other_iterable + Coord_orth
@@ -194,7 +194,7 @@ namespace clipper
       numpy.ndarray __add__() function takes precedence and attempts to
       do:
         [other_iterable[0]+Coord_orth, other_iterable[1]+Coord_orth, ...]
-      For this reason, it is probably best to leave the __radd__ and 
+      For this reason, it is probably best to leave the __radd__ and
       __rsub__ functions unimplemented.
       '''
       try:
@@ -255,7 +255,7 @@ namespace clipper
     @safesplat_float
     def _new_coord_frac(u, v, w):
         return Coord_frac(u, v, w)
-        
+
     def __add__(self, other):
       try:
         return self.__add_base__(other)
@@ -302,7 +302,7 @@ namespace clipper
     @safesplat_float
     def _new_coord_map(u, v, w):
         return Coord_orth(u, v, w)
-        
+
     def __add__(self, other):
       try:
         return self.__add_base__(other)
@@ -354,7 +354,7 @@ namespace clipper
     def dim(self):
       import numpy
       return numpy.array([self.nu(), self.nv(), self.nw()])
-    
+
     size = property(size)
   %}
 #endif

@@ -4,48 +4,52 @@ import clipper
 
 i = clipper.HKL_reference_index()
 
-xmap = clipper.Xmap_float()
 f = clipper.CCP4MAPfile()
 f.open_read(sys.argv[1])
-f.import_xmap_float(xmap)
+xmap = f.as_xmap()
 f.close_read()
 
 sg,samp,cell =  f.spacegroup(),f.grid_sampling(), f.cell()
 
-print sg.symbol_laue()
-print sg.symbol_hall()
-print cell
-print cell.dim, cell.angles
+print (sg.symbol_laue())
+print (sg.symbol_hall())
+print (cell)
+print (cell.dim, cell.angles)
 
-print cell.format()
-print type(cell.format())
+print (cell.format())
+print (type(cell.format()))
 
-print samp.nu(),samp.nv(),samp.nw()
+print (samp.dim)
 
-at = clipper.Atom()
+# Element, coords, occupancy, B-factor
+at = clipper.Atom('H',[0,0,0],1.0,60, u_aniso = [1,2,3,4,5,6], allow_unknown = False)
 # Do not know why this is necessary.
 #at.element = clipper.String("H")
-foo = clipper.String("foo")
+foo = clipper._clipper.String("foo")
 at.element = "H"
-print at.element
-print dir(at.element)
-print type(at.element)
-print type(foo)
+print (at.element)
+print (dir(at.element))
+print (type(at.element))
+print (type(foo))
 
 at.element = at.element
 
-stats = clipper.Map_stats(xmap)
-print stats.mean(), stats.min(),stats.max(),stats.std_dev()
+stats = clipper._clipper.Map_stats(xmap)
+print ('Stats from clipper::Map_stats:')
+print (stats.mean(), stats.min(),stats.max(),stats.std_dev())
+
+print ('Stats from Xmap.stats:')
+print (xmap.mean, xmap.min, xmap.max, xmap.sigma)
 
 # Range is unwrapped memory leak, but Range<double> and Range<float> are OK, but require specialized methods.
 # There may be a better way, but this works!
-print stats.range().max()
-print stats.range().min()
-print 0 in stats.range()
-print 100 in stats.range()
+print (stats.range().max())
+print (stats.range().min())
+print (0 in stats.range())
+print (100 in stats.range())
 
-c1 = clipper.Coord_orth(1,2,3)
-c2 = clipper.Coord_orth(10,10,10)
+c1 = clipper.Coord_orth([1,2,3])
+c2 = clipper.Coord_orth([10,10,10])
 
 c = c1+c2
 cm = -c
@@ -56,11 +60,20 @@ print cm.xyz
 cif = clipper.CIFfile()
 mydata = clipper.HKL_info()
 
-fphi1 = clipper.HKL_data_F_phi_float(mydata)
-fphi2 = clipper.HKL_data_F_phi_float(mydata)
+fphi1 = clipper._clipper.HKL_data_F_phi_double(mydata)
+fphi2 = clipper._clipper.HKL_data_F_phi_double(mydata)
+fphi3 = fphi1.copy()
 
-fphi3 = fphi1 + fphi2*.5
-fphi3p = fphi1 + .5*fphi2
+#fphi3 = fphi1 + fphi2*.5
+#fphi3p = fphi1 + .5*fphi2
+
+fphi1 = clipper._clipper.HKL_data_F_phi_float(mydata)
+fphi2 = clipper._clipper.HKL_data_F_phi_float(mydata)
+fphi3 = fphi1.copy()
+
+#fphi3 = fphi1 + fphi2*.5
+#fphi3p = fphi1 + .5*fphi2
+
 
 if len(sys.argv)>2:
   cif.open_read (sys.argv[2])
@@ -71,11 +84,34 @@ if len(sys.argv)>2:
   print sg.symbol_hall()
   print cell
   print cell.dim, cell.angles
-  myfsigf = clipper.HKL_data_F_sigF_float(mydata)
-  status = clipper.HKL_data_Flag(mydata)
+  myfsigf = clipper._clipper.HKL_data_F_sigF_float(mydata)
+  status = clipper._clipper.HKL_data_Flag(mydata)
+  print(type(myfsigf[0]))
+  print(type(status[0]))
   cif.import_hkl_data(myfsigf)
   cif.import_hkl_data(status)
   cif.close_read()
+  print('status length from __len__: ' + str(len(status)))
+  print(myfsigf.getData()[0])
+  print(myfsigf.getData()[-1])
+  print(len(myfsigf.getData()))
+  fsigf_numpy = myfsigf.as_numpy()
+  myfsigf.as_numpy(fsigf_numpy)
+  fsigf_numpy_new = myfsigf.as_numpy(func = 'new')
+  for i in range(len(fsigf_numpy)):
+      if not numpy.isnan(fsigf_numpy[i][0]):
+          print fsigf_numpy[i]
+          print fsigf_numpy_new[i]
+          print i
+          break
+  assert numpy.allclose(fsigf_numpy, fsigf_numpy_new, equal_nan = True)
+  print(len(fsigf_numpy))
+
+  print fsigf_numpy[0]
+  print fsigf_numpy[-1]
+
+
+
   """
   # This is numpy testing
   print "F_SIGF size",myfsigf.data_size(), len(myfsigf)
@@ -86,10 +122,10 @@ if len(sys.argv)>2:
   print fsigf_numpy+fsigf_numpy ; sys.stdout.flush()
   """
   print  mydata.num_reflections()
-  cxtl = clipper.MTZcrystal()
-  fm = clipper.MMDBfile()
+  cxtl = clipper._clipper.MTZcrystal()
+  fm = clipper._clipper.MMDBfile()
   fm.read_file(sys.argv[3])
-  mmol = clipper.MiniMol ()
+  mmol = clipper._clipper.MiniMol ()
   fm.import_minimol ( mmol )
   atoms = mmol.atom_list()
   print len(atoms)
@@ -127,9 +163,9 @@ if len(sys.argv)>2:
   print dir(abcd)
   abcd.compute_from_phi_fom( phiw );
   print "Done ABCD calc..."
- 
+
   phiw.compute_from_abcd ( abcd );
-  print "...and back to Phi_fom" 
+  print "...and back to Phi_fom"
 
   xmap2 = clipper.Xmap_float()
   rate = 1.33333
@@ -152,7 +188,3 @@ if len(sys.argv)>2:
   print invert
 
   print shift.uvw
-
-
-
-

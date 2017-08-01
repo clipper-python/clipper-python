@@ -4,27 +4,29 @@ namespace clipper
 {
 #ifndef PYTHON_PROPERTIES
   std::string element() { return self->element(); }
+#else
+  std::string _get_element() { return self->element(); }
 #endif
 
 #ifdef PYTHON_PROPERTIES
   %pythoncode %{
     _allow_unknown = True
-    
+
     @property
     def allow_unknown(self):
       return self._allow_unknown
-    
+
     @allow_unknown.setter
     def allow_unknown(self, allow):
       self._allow_unknown = allow
-    
+
     def _set_element_with_check(self, element_name):
       if not self.allow_unknown:
         if element_name not in ('H', 'C', 'N', 'O', 'S'):
           if element_name not in ATOM_NAMES:
             raise TypeError('Unrecognised element!')
       self._set_element(element_name)
-        
+
     element = property(_get_element, _set_element_with_check)
     occupancy = property(_get_occupancy, _set_occupancy)
     u_iso = property(_get_u_iso, _set_u_iso)
@@ -50,8 +52,7 @@ namespace clipper
     def _set_u_aniso_vals(self, u_aniso):
       import numpy
       if u_aniso is None:
-        from math import nan
-        self._set_u_aniso(U_aniso_orth(*([nan]*6)))
+        self._set_u_aniso(U_aniso_orth(*([float('nan')]*6)))
       else:
         try:
           self._set_u_aniso(U_aniso_orth(*u_aniso))
@@ -74,16 +75,16 @@ namespace clipper
 %extend Atom_list
 /* There is probably a bit more work to do here to make this object really
  * useful for Python. The fundamental problem is that the clipper Atom_list
- * is just a std::vector of Atom objects, meaning that a naive slicing 
+ * is just a std::vector of Atom objects, meaning that a naive slicing
  * implementation would return a new Atom_list object filled with copies
- * of the atoms rather than pointers. So Atom_list[0:5].coords = array, while 
- * appearing perfectly legal in Python, would not actually do anything to 
+ * of the atoms rather than pointers. So Atom_list[0:5].coords = array, while
+ * appearing perfectly legal in Python, would not actually do anything to
  * the stored atoms.
  * At present the only ways to modify the actual Atoms stored in the array
- * are either one at a time, or all at once. It would be much better to 
- * create a C++ wrapper class that safely stores the actual Atom_list 
- * object, but provides individual/arrays of Atom pointers on indexing 
- * or slicing. We could also then easily create a constructor to initialise 
+ * are either one at a time, or all at once. It would be much better to
+ * create a C++ wrapper class that safely stores the actual Atom_list
+ * object, but provides individual/arrays of Atom pointers on indexing
+ * or slicing. We could also then easily create a constructor to initialise
  * directly from arrays of atom properties.
  *
  */
@@ -365,21 +366,21 @@ namespace clipper
 
   %pythoncode %{
     _allow_unknown = True
-    
+
     @property
     def allow_unknown(self):
       return self._allow_unknown
-    
+
     @allow_unknown.setter
     def allow_unknown(self, allow):
       self._allow_unknown = allow
-    
+
 #ifdef PYTHON_PROPERTIES
 
     def _get_elements(self):
       '''Ordered list of all element names'''
       return self._get_elements_base()
-    
+
     def _set_elements(self, elements):
       if not self.allow_unknown:
         if not set(elements).issubset(ATOM_NAMES):
@@ -394,11 +395,11 @@ namespace clipper
             '''.format(bad_atoms)
           raise TypeError(errstring)
       self._set_elements_base(elements)
-    
+
     elements = property(_get_elements, _set_elements)
-    
-          
-      
+
+
+
     def _get_coord_orth(self):
       '''Orthographic (x,y,z) coordinates of all atoms'''
       import numpy
@@ -406,16 +407,16 @@ namespace clipper
       coords = numpy.empty((n,3), numpy.double)
       self._get_coord_orth_base(coords)
       return coords
-    
+
     def _set_coord_orth(self, coords):
       import numpy
       n = len(self)
       array_in = numpy.empty((n, 3), numpy.double)
       array_in[:] = coords
       self._set_coord_orth_base(array_in)
-    
+
     coord_orth = property(_get_coord_orth, _set_coord_orth)
-    
+
     def _get_occupancies(self):
       '''Occupancies of all atoms.'''
       import numpy
@@ -423,16 +424,16 @@ namespace clipper
       occ = numpy.empty(n, numpy.double)
       self._get_occupancies_base(occ)
       return occ
-    
+
     def _set_occupancies(self, occ):
       import numpy
       n = len(self)
       array_in = numpy.empty(n, numpy.double)
       array_in[:] = occ
       self._set_occupancies_base(array_in)
-    
+
     occupancies = property(_get_occupancies, _set_occupancies)
-    
+
     def _get_u_isos(self):
       '''Isotropic B-factors of all atoms.'''
       import numpy
@@ -440,16 +441,16 @@ namespace clipper
       uisos = numpy.empty(n, numpy.double)
       self._get_u_isos_base(uisos)
       return uisos
-    
+
     def _set_u_isos(self, uisos):
       import numpy
       n = len(self)
       array_in = numpy.empty(n, numpy.double)
       array_in[:] = uisos
       self._set_u_isos_base(array_in)
-    
+
     u_isos = property(_get_u_isos, _set_u_isos)
-    
+
     def _get_u_anisos(self):
       '''
       Anisotropic B-factor matrices for all atoms as an nx6 array, in the
@@ -461,18 +462,18 @@ namespace clipper
       uaniso = numpy.empty((n,6), numpy.double)
       self._get_u_anisos_base(uaniso)
       return uaniso
-    
+
     def _set_u_anisos(self, u_anisos):
       import numpy
       n = len(self)
       array_in = numpy.empty((n,6), numpy.double)
       array_in[:] = u_anisos
       self._set_u_anisos_base(array_in)
-    
+
     u_anisos = property(_get_u_anisos, _set_u_anisos)
 
 #endif
-    
+
   %}
 
 } // extend Atom_list

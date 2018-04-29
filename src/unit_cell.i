@@ -28,7 +28,8 @@
                     sample_frequency = 2)
       ---> Symops
   Returns a Symops object providing all symmetry operators which place
-  some part of the atomic model within a box in grid space.
+  some part of the atomic model within a box in grid space. If present, the
+  identity operator will always appear first in the list.
   NOTE: this routine is optimised for speed rather than strictness, and
   may occasionally return extra operators which place the model just
   outside the target box. Think of the result as a shortlist of operators
@@ -58,6 +59,7 @@
 %ignore clipper::Unit_Cell::inv_symops();
 
 %inline %{
+#include <set>
   namespace clipper
   {
   //! Condensed unit cell description
@@ -214,7 +216,7 @@
      *    pairlist: vector to append the found symops to
      *    thecoord: input grid coordinate
      */
-    void find_symops_of_coord(std::vector<std::pair<int, Coord_grid> >& pairlist, const Coord_grid& thecoord)
+    void find_symops_of_coord(std::vector<Coord_Grid_and_Unit_Cell_Offset>& pairlist, const Coord_grid& thecoord)
     {
       Coord_grid shift;
       Coord_grid t_coord;
@@ -234,7 +236,7 @@
         for (size_t i = 0; i < inv_symops_.size(); i++) {
           t_coord = (thecoord.unit(grid_) + *it).transform(inv_isymops_[i]);
           if (reference_model_bounds_.in_grid(t_coord))
-            pairlist.push_back(std::pair<int, Coord_grid>(i, shift));
+            pairlist.push_back(Coord_Grid_and_Unit_Cell_Offset(i, shift));
         }
       }
     }
@@ -251,13 +253,8 @@
        * coordinates for speed.
        */
 
-      std::vector<std::pair<int, Coord_grid> > ops_and_translations;
-      if (always_include_identity) {
-        std::pair<int, Coord_grid> identity;
-        identity.first = 0;
-        identity.second = Coord_grid(0,0,0);
-        ops_and_translations.push_back(identity);
-      }
+      std::vector<Coord_Grid_and_Unit_Cell_Offset> ops_and_translations;
+      Coord_Grid_and_Unit_Cell_Offset identity(0, Coord_grid(0,0,0));
 
       Coord_grid ref_grid = ref_.coord_grid(grid_);
       int num_symops = isymops_.size();
@@ -297,18 +294,31 @@
         u += step_size;
         if ( u > box_max[0] ) u = box_max[0];
       }
+
       // Sort the two vectors, and remove any duplicates
-      std::sort(ops_and_translations.begin(), ops_and_translations.end(), compare_int_Coord_grid_pairs);
+      /* std::sort(ops_and_translations.begin(), ops_and_translations.end(), compare_int_Coord_grid_pairs);
 
       ops_and_translations.erase( std::unique( ops_and_translations.begin(),
                                   ops_and_translations.end(),
                                   int_Coord_grid_pairs_equal
-                                             ), ops_and_translations.end() );
+                                             ), ops_and_translations.end() ); */
 
-      for (std::vector<std::pair<int, Coord_grid > >::iterator it = ops_and_translations.begin();
-           it != ops_and_translations.end(); ++it) {
-        RTop_frac thisop = symops_[it->first];
-        thisop.trn() += (it->second).coord_frac(grid_);
+      std::set<Coord_Grid_and_Unit_Cell_Offset > unique_symops(
+        ops_and_translations.begin(), ops_and_translations.end()
+        );
+
+      if (unique_symops.find(identity) != unique_symops.end()) {
+        unique_symops.erase(identity);
+        ret.append(RTop_frac::identity());
+      } else if (always_include_identity) {
+        ret.append(RTop_frac::identity());
+      }
+
+
+      for (std::set<Coord_Grid_and_Unit_Cell_Offset>::iterator it = unique_symops.begin();
+           it != unique_symops.end(); ++it) {
+        RTop_frac thisop = symops_[it->symop];
+        thisop.trn() += (it->uc_offset).coord_frac(grid_);
         ret.append(thisop);
 
       }

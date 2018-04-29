@@ -150,8 +150,8 @@ namespace clipper
     size_t my_len = self -> size();
     if (in_len != my_len) {
       std::string errString;
-      errString = "Input array length of " + std::to_string(in_len)
-                  + " does not match target array length of " + std::to_string(my_len);
+      errString = "Input array length of " + to_string(in_len)
+                  + " does not match target array length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     for (size_t i = 0; i < my_len; i++) {
@@ -181,8 +181,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n1 != my_len) {
-      std::string errString = "Input array length of " + std::to_string(n1) +
-                              " does not match target array length of " + std::to_string(my_len);
+      std::string errString = "Input array length of " + to_string(n1) +
+                              " does not match target array length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     if (n2 != 3) {
@@ -204,8 +204,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n1 != my_len) {
-      std::string errString = "Target array length of " + std::to_string(n1) +
-                              " does not match Atom_list length of " + std::to_string(my_len);
+      std::string errString = "Target array length of " + to_string(n1) +
+                              " does not match Atom_list length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     if (n2 != 3) {
@@ -228,8 +228,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n != my_len) {
-      std::string errString = "Input array length of " + std::to_string(n) +
-                              " does not match target array length of " + std::to_string(my_len);
+      std::string errString = "Input array length of " + to_string(n) +
+                              " does not match target array length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     for (size_t i = 0; i < n; i++) {
@@ -246,8 +246,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n != my_len) {
-      std::string errString = "Target array length of " + std::to_string(n) +
-                              " does not match Atom_list length of " + std::to_string(my_len);
+      std::string errString = "Target array length of " + to_string(n) +
+                              " does not match Atom_list length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     for (size_t i = 0; i < n; i++) {
@@ -263,8 +263,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n != my_len) {
-      std::string errString = "Input array length of " + std::to_string(n) +
-                              " does not match target array length of " + std::to_string(my_len);
+      std::string errString = "Input array length of " + to_string(n) +
+                              " does not match target array length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     for (int i = 0; i < n; i++) {
@@ -281,8 +281,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n != my_len) {
-      std::string errString = "Target array length of " + std::to_string(n) +
-                              " does not match Atom_list length of " + std::to_string(my_len);
+      std::string errString = "Target array length of " + to_string(n) +
+                              " does not match Atom_list length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     for (size_t i = 0; i < n; i++) {
@@ -298,8 +298,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n1 != my_len) {
-      std::string errString = "Input array length of " + std::to_string(n1) +
-                              " does not match target array length of " + std::to_string(my_len);
+      std::string errString = "Input array length of " + to_string(n1) +
+                              " does not match target array length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     if (n2 != 6) {
@@ -324,8 +324,8 @@ namespace clipper
   {
     size_t my_len = self -> size();
     if (n1 != my_len) {
-      std::string errString = "Target array length of " + std::to_string(n1) +
-                              " does not match Atom_list length of " + std::to_string(my_len);
+      std::string errString = "Target array length of " + to_string(n1) +
+                              " does not match Atom_list length of " + to_string(my_len);
       throw std::length_error(errString);
     }
     if (n2 != 6) {

@@ -1,4 +1,5 @@
 %{
+#include <string>
   namespace clipper
   {
   /* Some simple functions for sorting and removing duplicates from
@@ -6,48 +7,41 @@
    * These are only used internally for finding symmetry operators mapping
    * the atomic model to a region, and don't need to be wrapped.
    */
-  bool compare_int_Coord_frac_pairs (const std::pair<int, Coord_frac > &a, const std::pair<int, Coord_frac > &b)
+
+  struct Coord_Grid_and_Unit_Cell_Offset
   {
-    if (a.first < b.first) return true;
-    if (a.first > b.first) return false;
-    for (int i = 0; i < 3; i++) {
-      if (a.second[i] > b.second[i]) return false;
-      if (a.second[i] < b.second[i]) return true;
+    int symop;
+    Coord_grid uc_offset;
+
+    Coord_Grid_and_Unit_Cell_Offset(int op, const Coord_grid& offset)
+    {
+      symop = op;
+      uc_offset = offset;
     }
-    return false;
-  }
 
-  bool int_Coord_frac_pairs_equal (const std::pair<int, Coord_frac > &a, const std::pair<int, Coord_frac > &b)
-  {
-    double eps = 1e-6;
-    if (a.first != b.first) return false;
-    for (int i=0; i < 3; i++) {
-      if (std::abs(a.second[i] - b.second[i]) > eps) return false;
+    bool operator<(const Coord_Grid_and_Unit_Cell_Offset& other) const
+    {
+      if (symop < other.symop ) return true;
+      if (symop > other.symop ) return false;
+      const Coord_grid& uo = other.uc_offset;
+        for (int i=0; i<3; ++i) {
+          if (uc_offset[i] < uo[i]) return true;
+          if (uc_offset[i] > uo[i]) return false;
+        }
+      return false;
     }
-    return true;
-  }
 
-
-  bool compare_int_Coord_grid_pairs (const std::pair<int, Coord_grid > &a, const std::pair<int, Coord_grid > &b)
-  {
-    if (a.first < b.first) return true;
-    if (a.first > b.first) return false;
-    for (int i = 0; i < 3; i++) {
-      if (a.second[i] > b.second[i]) return false;
-      if (a.second[i] < b.second[i]) return true;
+    bool operator==(const Coord_Grid_and_Unit_Cell_Offset& other) const
+    {
+      if (symop != other.symop) return false;
+      const Coord_grid& uo = other.uc_offset;
+      for (int i=0; i<3; ++i) {
+        if (uc_offset[i] != uo[i]) return false;
+      }
+      return true;
     }
-    return false;
-  }
 
-  bool int_Coord_grid_pairs_equal (const std::pair<int, Coord_grid > &a, const std::pair<int, Coord_grid > &b)
-  {
-
-    if (a.first != b.first) return false;
-    for (int i=0; i < 3; i++) {
-      if (a.second[i] != b.second[i]) return false;
-    }
-    return true;
-  }
+  };
 
   Coord_frac cell_shift (const Coord_frac& coord)
   {
@@ -169,8 +163,8 @@
       void _all_matrices44_frac(double* numpy_array, int n1, int n2, int n3)
       {
         if (size_ != n1) {
-          std::string errstring = "Target array length of " + std::to_string(n1) +
-                   "does not match Symops array length of " + std::to_string(size_);
+          std::string errstring = "Target array length of " + to_string(n1) +
+                   "does not match Symops array length of " + to_string(size_);
           throw std::length_error(errstring);
         }
         if (n2 !=4 || n3 != 4) {
@@ -209,8 +203,8 @@
       void _all_matrices34_frac(double* numpy_array, int n1, int n2, int n3)
       {
         if (size_ != n1) {
-          std::string errstring = "Target array length of " + std::to_string(n1) +
-                   "does not match Symops array length of " + std::to_string(size_);
+          std::string errstring = "Target array length of " + to_string(n1) +
+                   "does not match Symops array length of " + to_string(size_);
           throw std::length_error(errstring);
         }
         if (n2 !=3 || n3 != 4) {
@@ -240,8 +234,8 @@
       void _all_matrices44_orth(const Cell& cell, double* numpy_array, int n1, int n2, int n3)
       {
         if (size_ != n1) {
-          std::string errstring = "Target array length of " + std::to_string(n1) +
-                   "does not match Symops array length of " + std::to_string(size_);
+          std::string errstring = "Target array length of " + to_string(n1) +
+                   "does not match Symops array length of " + to_string(size_);
           throw std::length_error(errstring);
         }
         if (n2 !=4 || n3 != 4) {
@@ -280,8 +274,8 @@
       void _all_matrices34_orth(const Cell& cell, double* numpy_array, int n1, int n2, int n3)
       {
         if (size_ != n1) {
-          std::string errstring = "Target array length of " + std::to_string(n1) +
-                   "does not match Symops array length of " + std::to_string(size_);
+          std::string errstring = "Target array length of " + to_string(n1) +
+                   "does not match Symops array length of " + to_string(size_);
           throw std::length_error(errstring);
         }
         if (n2 !=3 || n3 != 4) {

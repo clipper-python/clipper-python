@@ -19,6 +19,8 @@ __pycache__/
 # Exclusions for precompiled libraries
 !libfftw2xc.so
 !libfftw_mkl_core.so
+!libfftw2xc.dylib
+!mkl_custom.dylib
 
 
 

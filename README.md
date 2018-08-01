@@ -1,8 +1,6 @@
 # Clipper-Python
 
-Fully self-contained Python wrapping of Kevin Cowtan's Clipper_ library for handling of crystallographic and cryo-EM macromolecular data. 
-
-.. _Clipper: http://www.ysbl.york.ac.uk/~cowtan/clipper/doc/ 
+Fully self-contained Python wrapping of Kevin Cowtan's [Clipper](http://www.ysbl.york.ac.uk/~cowtan/clipper/doc/) library for handling of crystallographic and cryo-EM macromolecular data. 
 
 ## Getting Started
 
@@ -22,13 +20,11 @@ python3 -m pip install --user ./Clipper_Python-0.2*.whl
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
 ```
-Python 3 or above, with a recent version of Numpy installed
-Pybind11 headers installed on the system search path.
+- Python 3 or above, with a recent version of Numpy installed
+- Pybind11 headers installed on the system search path.
 ```
-**NOTE**: as per this discussion_ on the pybind11 GitHub issues, you may need to edit `pybind11.h` to replace the line:
+**NOTE**: as per [this discussion](https://github.com/pybind/pybind11/issues/1317) on the pybind11 GitHub issues, you may need to edit `pybind11.h` to replace the line:
 
 ```
 record.default_holder = std::is_same<holder_type, std::unique_ptr<type>>::value;
@@ -40,7 +36,6 @@ with
 record.default_holder = detail::is_instantiation<std::unique_ptr, holder_type>::value;
 ```
 
-.. _discussion: https://github.com/pybind/pybind11/issues/1317
 
 
 ## License

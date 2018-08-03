@@ -184,22 +184,33 @@
   </CLibrary>
 
  
-  <CModule name="clipper_python" usesNumpy="true">
+    <CModule name="clipper_python" usesNumpy="true">
       <CompileArgument>-fvisibility=hidden</CompileArgument>
-      <IncludeDir>src/deps</IncludeDir>
-      <IncludeDir>src/deps/mmdb2</IncludeDir>
-     <IncludeDir>src/deps/libccp4</IncludeDir>
-       <LibraryDir>src</LibraryDir>
+      <IncludeDir>src/include</IncludeDir>
+      <LibraryDir>src</LibraryDir>
       <Library>clipper</Library>
+      <CompileArgument>-Os</CompileArgument>
+      <SourceFile>src/bindings/contrib/wrap_skeleton.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_sfweight.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_sfscale.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_sfcalc.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_sfcalc_obs.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_originmatch.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_mapfilter.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_fffear.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_edcalc.cpp</SourceFile>
+      <SourceFile>src/bindings/contrib/wrap_convolution_search.cpp</SourceFile>
+
 
       <SourceFile>src/bindings/wrap_clipper_util.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_map_utils.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_ccp4_mtz_io.cpp</SourceFile>
-      <SourceFile>src/bindings/wrap_xmap.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_unit_cell.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_symops.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_spacegroup.cpp</SourceFile>
+      <SourceFile>src/bindings/wrap_xmap.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_nxmap.cpp</SourceFile>
+      <SourceFile>src/bindings/wrap_nxmap_operator.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_hkl_datatypes.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_hkl_data.cpp</SourceFile>
       <SourceFile>src/bindings/wrap_derivs.cpp</SourceFile>
